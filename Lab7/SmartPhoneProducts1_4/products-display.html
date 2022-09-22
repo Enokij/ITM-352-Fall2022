@@ -11,10 +11,10 @@
         const store_name = "Justin Enoki";
     </script>
     <script>
-    var hits=0; 
-    var spins=0; hitSpinRatio=0;
-    var first_name = "<b>Justin</b>"; last_name = "<i>Enoki</i>";
-    var over_half = false; 
+        var hits=0; 
+        var spins=0; 
+        var hitSpinRatio=hits/spins;
+        var first_name = "<b>Justin</b>"; last_name = "<i>Enoki</i>";
     </script>
     
 </head>
@@ -32,7 +32,7 @@
             hits:<span id="hits_span">0</span>
             spins:<span id="spins_span">0</span>
             hit/spin:<span id="hit_spin_span">0</span>
-            You win:<span id="win_span">pending...</span>
+            Progress:<span id="win_span">pending...</span>
             </p>
 </header>   
     
@@ -40,20 +40,40 @@
     onchange="localStyle.innerHTML = '.rotate img {animation-duration: ' + speedSlider.value + 's;}';"
     >
     <div><main>
-        <section class="item" 
-        onmouseover="
-        if (this.className == 'item') { //always use == in an if statement.
-            className='item rotate'; spins++; hitSpinRatio = hits / spins; spins_span.innerHTML=spins;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
-        }
-      
+        <section class="item" onmouseover="className='item rotate'; spins++; hitSpinRatio = hits / spins; spins_span.innerHTML=spins;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
+               if ( hitSpinRatio < .25 ) {
+            progress = 'On your way!';
+            win_span.innerHTML = progress;
+        } else if ( hitSpinRatio < 0.50 ) {
+            progress = 'Almost there!';
+            win_span.innerHTML = progress;
+        } else if ( hitSpinRatio > 0.50 ) {  
+                progress = 'You won!';
+                win_span.innerHTML = progress;
+            
+        } else { 
+            progress = 'Get going!';
+            win_span.innerHTML = progress;
+    }      
+
         " 
-        onclick="
-        if (this.className != 'item') {
-            className='item'; hits++; hitSpinRatio = hits / spins; hits_span.innerHTML=hits;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
-        } else {
-            className='item rotate'; spins++; hitSpinRatio = hits / spins; spins_span.innerHTML=spins;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
-        }
         
+        onclick="className='item'; hits++; hitSpinRatio = hits / spins; hits_span.innerHTML=hits;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
+               if ( hitSpinRatio < .25 ) {
+            progress = 'On your way!';
+            win_span.innerHTML = progress;
+        } else if ( hitSpinRatio < 0.50 ) {
+            progress = 'Almost there!';
+            win_span.innerHTML = progress;
+        } else if ( hitSpinRatio > 0.50 ) {  
+                progress = 'You won!';
+                win_span.innerHTML = progress;
+            
+        } else { 
+            progress = 'Get going!';
+            win_span.innerHTML = progress;
+    }      
+
         ">
         <h2>HTC</h2>
         <p>&dollar; 40.00</p>
