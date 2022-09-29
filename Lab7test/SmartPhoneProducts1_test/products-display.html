@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=<<device-width>>, initial-scale=1.0">
+    <title>Smartphones</title>
+    <link rel="stylesheet" href="product-style.css">
+    <style id="localStyle"></style>
+    <script>
+        const store_name = "Justin Enoki";
+    </script>
+    <script>
+        var hits=0; 
+        var spins=0; 
+        var hitSpinRatio=hits/spins;
+        var first_name = "<b>Justin</b>"; last_name = "<i>Enoki</i>";
+    </script>
+    
+</head>
+
+<header>
+    <h3><p id="title">
+        <script>
+        document.write(first_name + " " + last_name);
+        style="font-size=600%:"
+    </script></p>
+    </h3>
+    <h1 id="myHead">
+        Used Smart Phone Store</h1>
+        <p style="text-align: center; font-weight: bold;">
+            hits:<span id="hits_span">0</span>
+            spins:<span id="spins_span">0</span>
+            hit/spin:<span id="hit_spin_span">0</span>
+            Progress:<span id="win_span">pending...</span>
+            </p>
+</header>   
+    
+    <input id='speedSlider' type='range' min=".1" max="5" step=".1" style="direction: rtl;"
+    onchange="localStyle.innerHTML = '.rotate img {animation-duration: ' + speedSlider.value + 's;}';"
+    >
+    <div><main>
+        <section class="item" 
+        onmouseover="
+        if (this.className == 'item') { //always use == in an if statement.
+            className='item rotate'; spins++; hitSpinRatio = hits / spins; spins_span.innerHTML=spins;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
+        }
+        if (spins < hits * 2 || over_half == true) {
+            over_half = true;
+            win_span.innerHTML = over_half;
+            } else {
+                over_half = false;
+                win_span.innerHTML = over_half;
+            }
+      
+        " 
+        onclick="
+        if (this.className != 'item') {
+            className='item'; hits++; hitSpinRatio = hits / spins; hits_span.innerHTML=hits;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
+        } else {
+            className='item rotate'; spins++; hitSpinRatio = hits / spins; spins_span.innerHTML=spins;  hit_spin_span.innerHTML= hitSpinRatio.toFixed(2);
+        }
+        if (spins < hits * 2 || over_half == true) {
+            over_half = true;
+            win_span.innerHTML = over_half;
+            } else {
+                over_half = false;
+                win_span.innerHTML = over_half;
+            }
+        
+        ">
+
+        <h2>HTC</h2>
+        <p>&dollar; 40.00</p>
+        <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/HTC.jpg" alt="photo"></img>
+    </section>
+    <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
+        <h2>Apple</h2>
+        <p>&dollar; 75.00</p>
+        <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/iphone-3gs.jpg" alt="photo"></img>
+    </section>
+    <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
+        <h2>Nokia</h2>
+        <p>&dollar; 35.00</p>
+        <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Nokia.jpg" alt="photo"></img>
+    </section>
+    <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
+        <h2>Samsung</h2>
+        <p>&dollar; 45.00</p>
+        <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Samsung.jpg" alt="photo"></img>
+    </section>
+    <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
+        <h2>Blackberry</h2>
+        <p>&dollar; 10.00</p>
+        <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg" alt="photo"></img>
+    </section>
+    
+</main></div>
+
+
+<p class="quote"></p>
+<footer>
+    <table border="1" style = "margin-left:auto; margin-right: auto; text-align: center;">
+        <tr> <th><h2>Your one-stop phone shop</h2></th></tr>
+        <tr><td>1.</td><td><br>Copyright @ Justin Enoki</br></td></tr>
+        <tr><td>2.</td><td>2021</td></tr>
+        <tr><td>3.</td><td>11:15AM</td></tr>
+
+</footer>
+</body>
+</html>
