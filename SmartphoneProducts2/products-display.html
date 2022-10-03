@@ -3,6 +3,28 @@
 
 <head>
     <script src="./products_data1.js"></script>
+    <script>
+    var name1 = "HTC";
+    var price1 = 40.00;
+    var image1 = "http://dport96.github.io/ITM352/morea/080.flow-control-II/HTC.jpg";
+
+    var name2 = "Apple";
+    var price2 = 75.00;
+    var image2 = "http://dport96.github.io/ITM352/morea/080.flow-control-II/iphone-3gs.jpg";
+
+    var name3 = "Nokia";
+    var price3 = 35.00;
+    var image3 = "http://dport96.github.io/ITM352/morea/080.flow-control-II/Nokia.jpg";
+
+    var name4 = "Samsung";
+    var price4 = 45.00;
+    var image4 = "http://dport96.github.io/ITM352/morea/080.flow-control-II/Samsung.jpg";
+
+    var name5 = "Blackberry";
+    var price5 = 10.00;
+    var image5 = "http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg";
+    </script>
+
     <meta charset="utf-8">
     <title>Smart Phone Store</title>
 
@@ -33,36 +55,48 @@
         </aside>
 
         <main>
-            <section class="item" id="HTC" onmouseover="className='item rotate' " onclick="className='item'">
-                <h2><script>document.write(name1)</script></h2>
-                <p>$<script>document.write(price1)</script></p>
-                <img id="image1_id"><script>image1_id.src = image1;</script>
+             <section class="item" id="HTC">
+                <h2>HTC</h2>
+                <p>$40.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/HTC.jpg" alt="HTC Phones">
             </section>
 
-            <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
-                <h2><script>document.write(name2)</script></h2>
-                <p>$<script>document.write(price2)</script></p>
-                <img id="image2_id"><script>image2_id.src = image2;</script>
+            <section class="item">
+                <h2>Apple</h2>
+                <p>$75.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/iphone-3gs.jpg">
             </section>
 
-            <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
-                <h2><script>document.write(name3)</script></h2>
-                <p>$<script>document.write(price3)</script></p>
-                <img id="image3_id"><script>image3_id.src = image3;</script>
+            <section class="item">
+                <h2>Nokia</h2>
+                <p>$35.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Nokia.jpg">
             </section>
 
-            <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
-                <h2><script>document.write(name4)</script></h2>
-                <p>$<script>document.write(price4)</script></p>
-                <img id="image4_id"><script>image4_id.src = image4;</script>
+            <section class="item">
+                <h2>Samsung</h2>
+                <p>$45.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Samsung.jpg">
             </section>
 
-            <section class="item" onmouseover="className='item rotate' " onclick="className='item' ">
-                <h2><script>document.write(name5)</script></h2>
-                <p>$<script>document.write(price5)</script></p>
-                <img id="image5_id"><script>image5_id.src = image5;</script>
+            <section class="item">
+                <h2>Blackberry</td>
+                </h2>
+                <p>$10.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg">
             </section>
-
+            <script>
+                for (i=1; 1<=5; i++){
+                document.write(`<section class="item">
+                <h2>Blackberry</td>
+                </h2>
+                <p>$10.00</p>
+                <img src="http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg">
+            </section>
+            `);
+        }
+                </script>
+            
         </main>
     </div>
     <footer>
