@@ -1,4 +1,4 @@
-var attributes  =  "<name>;<age>;<major>";
+var attributes  =  "Justin;22;Accounting";
 var pieces = attributes.split(";");
 
 for (i=0; i<pieces.length; i++){
