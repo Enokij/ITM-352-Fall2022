@@ -1,3 +1,9 @@
+
+index = 0;
+item = 0;
+var attributes = "Daniel;21;21.5;-20.5";
+var pieces = attributes.split(";");
+
 // Function that takes a string as input and, depending on the value of returnErrors, returns an array of errors or a boolean indicating: true
 // if that string is a non-negative integer and false otherwise.
 function isNonNegInt(queryString, returnErrors = false){
@@ -15,17 +21,18 @@ function isNonNegInt(queryString, returnErrors = false){
     }
     }
 
-var attributes = "Daniel;21;21.5;-20.5";
 
-var pieces = attributes.split(";");
+
+
 
 function checkIt(item, index){
-        console.log(`part ${index} is ${(isNonNegInt(item)?'a':'not a')} quantity`);
+        
 }
 
 for (i=0; i<pieces.length; i++) {
         errorArray = isNonNegInt(pieces[i], true);
-        console.log(`i: ${i} ${errorArray.join(", ")}`);
+        console.log(`part ${index} is ${(isNonNegInt(item)?'a':'not a')} quantity`);
+        pieces.forEach(checkIt);
         
 }
 

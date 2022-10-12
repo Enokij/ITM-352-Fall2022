@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let params = (new URL(document.location)).searchParams;
+        //creating a new URL object, give me the search params and save it to "params"
+        let GET = {};
+        params.forEach(function (value, key) { GET[key] = value; document.write("<br>Got " + value);});
+        //The [key] is the object, and it will equal what the value is (value is whatever the user entered)
+    </script>
+
+    <form name="my_form" action="" method="GET">
+        Enter something;
+        <input type="text" name="my_textbox" id="the_textbox">
+        <br>
+        Enter Email:
+        <input type="email" name="my_email">
+        <br>
+        <select name="select_box">
+            <option value="Regular">Regular</option>
+            <option value="Special">Special</option>
+        </select>
+        <br>
+        <input type="submit">
+    </form>
+</body>
+</html>
