@@ -1,63 +1,57 @@
 <script src="./product_data.js"></script>
-
+ 
 <script>
-
-    quantities = [-1,0,"cat",5,6];
-
+ 
+    quantities = [-2,1,"cat",5,0];
+ 
     function isNonNegInt(queryString, returnErrors = false){
     errors = []; // assume no errors at first
     if(Number(queryString) != queryString) errors.push('Not a number!'); // Check if string is a number value
     if(queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
     if(parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
-      
+     
     if (returnErrors) {
         return errors;
     } else if (errors.length == 0) {
             return true;
-    } else { 
+    } else {
             return false;
     }
     }
-
     function generate_item_rows(product_quantities_array){
       for(i=0; i<product_quantities_array.length; i++) {
-        
         if(quantities[i]==0){
         continue;
           }
-          
-          errorArray = isNonNegInt(quantities[i], true);
+          errorArray = isNonNegInt(quantities[i], true)
+          if (errors.length == 0) {
+            extended_price = product_quantities_array[i] * products[i].price; 
+           (subtotal += extended_price)
+          } else {extended_price=0}
 
           
-         extended_price = product_quantities_array[i] * products[i].price;
-        
-         
-         
-
         document.write(`
           <tr>
             <td width="43%">${products[i].brand}</td>
-            <td align="center" width="11%">${quantities[i]} <br>${errorArray.join("<br>")}</br></td>
+            <td align="center" width="11%">${quantities[i]}<br>${errorArray.join("<br>")}</br></td>
             <td width="13%">\$${products[i].price}</td>
             <td width="54%">\$${extended_price}</td>
           </tr>
           `);
-        
-         
+          
+
           subtotal += extended_price;
-        
-        
-      
+
+
       }
-
-
+ 
     };
 
      //compute sub-totals
      var subtotal = 0;
      
 </script>
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,14 +71,14 @@
           </tr>
           <script>
             generate_item_rows(quantities);{
-              
+             
             };
-
-
+ 
+ 
                //compute tax rate
      var tax_rate = 0.0575;
      var tax = tax_rate*subtotal;
-
+ 
      //compute shipping cost
      var shipping = 0
      if (subtotal <= 50) {
@@ -97,12 +91,12 @@
       shipping  = 0.05*subtotal;
      }
      
-
+ 
      //compute grand total
      var total = subtotal + tax + shipping;
-
+ 
         </script>
-
+ 
           <tr>
             <td colspan="4" width="100%">&nbsp;</td>
           </tr>
@@ -124,7 +118,7 @@
           </tr>
         </tbody>
       </table>
-
+ 
       <div>
         <b>OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
 A subtotal $50 - $99.99 will be $5 shipping
