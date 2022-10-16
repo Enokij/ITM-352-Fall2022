@@ -2,7 +2,7 @@
  
 <script>
  
-    quantities = [-1,0,"cat",5,6];
+    quantities = [-2,1,"cat",5,0];
  
     function isNonNegInt(queryString, returnErrors = false){
     errors = []; // assume no errors at first
@@ -23,31 +23,30 @@
         if(quantities[i]==0){
         continue;
           }
-          errorArray = isNonNegInt(quantities[i], true);
- 
-         
-         extended_price = product_quantities_array[i] * products[i].price;
-         
-         
- 
+          errorArray = isNonNegInt(quantities[i], true)
+          if (errors.length == 0) {
+            extended_price = product_quantities_array[i] * products[i].price; 
+           (subtotal += extended_price)
+          } else {extended_price=0}
+
+          
         document.write(`
           <tr>
             <td width="43%">${products[i].brand}</td>
-            <td align="center" width="11%">${quantities[i]} <br>${errorArray.join("<br>")}</br></td>
+            <td align="center" width="11%">${quantities[i]}<br>${errorArray.join("<br>")}</br></td>
             <td width="13%">\$${products[i].price}</td>
             <td width="54%">\$${extended_price}</td>
           </tr>
           `);
-       
-         
+          
+
           subtotal += extended_price;
-       
-       
-       
+
+
       }
  
     };
- 
+
      //compute sub-totals
      var subtotal = 0;
      
