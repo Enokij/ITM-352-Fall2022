@@ -33,14 +33,11 @@
         document.write(`
           <tr>
             <td width="43%">${products[i].brand}</td>
-            <td align="center" width="11%">${quantities[i]}<br>${errorArray.join("<br>")}</br></td>
+            <td align="center" width="11%">${quantities[i]}<br><div style="color:red;">${errorArray.join("<br>")}</div></br></td>
             <td width="13%">\$${products[i].price}</td>
             <td width="54%">\$${extended_price}</td>
           </tr>
           `);
-          
-
-          subtotal += extended_price;
 
 
       }
