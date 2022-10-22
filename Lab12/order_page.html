@@ -76,3 +76,11 @@
     </script>
 </body>
 </html>
+
+for(i=0; i <= quantities.length; i++) {
+    value = params.get(`quantity${i}`).value;
+    validate = isNonNegInt(value);
+    if (validate){
+    quantities[i] = value;
+    }
+    }
