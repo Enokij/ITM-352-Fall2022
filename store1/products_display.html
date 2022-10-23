@@ -1,4 +1,5 @@
-    
+
+
 <!DOCTYPE html>
 <html>
 
@@ -11,8 +12,9 @@
     <link href="products-style.css" rel="stylesheet">
 
     <script src="./products_data.js"></script>
-    <script>//create a string with q textbox and append (display page 2)</script>
+   
 </head>
+
 <form name="quantity_form" action="./invoice3.html" method="GET">
 <body>
     <header>
@@ -20,25 +22,23 @@
     </header>
     <div>
 
+
         <main>
  
-
             
            <script>
-
- 
             for (i=0; i<products.length; i++){
                 document.write(`
                 <section class="item">
                 <h2>${products[i].brand}</h2>
                 <h6>Quantities</h6>
-                <input type="text" name="quantity${i}" id="quantity${i}_label"> 
+                <input type="text" name="quantity${i}" id=quantity${i}_label>
                 </input>
                 <p>\$${products[i].price}</p>
                 <img src="${products[i].image}">
-                </section>
+            </section>
                 `)
-        }
+            }
            </script>
         </main>
     </div>
@@ -46,10 +46,9 @@
         <h1>
             Your One Stop For Used Phones
             <br>
-            <input type="submit" value = "Purchase!">
+            <input type="submit" value="Purchase!">
         </h1>
     </footer>
-</form>
 </body>
 </form>
 

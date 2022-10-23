@@ -45,6 +45,32 @@ h2 {
   padding-top: 0.3rem;
 }
 
+h6 {
+  font-size: 1rem;
+  color: white;
+  text-align: right;
+  width: 160px;
+  position: absolute;
+  right: 4%;
+  z-index: 3000;
+  line-height: 4rem;
+  padding-top: 0.3rem;
+}
+
+input[type=text], select {
+  width: 20%;
+  height: 70px;
+  position: absolute;
+  text-align: right;
+  right: 4%;
+  padding: 20px 20px;
+  margin: 60px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
 p {
   font-size: 1.5rem;
 }
@@ -111,7 +137,6 @@ aside {
 aside div {
   margin-bottom: 20px;
 }
-
 
 /* Styling the products */
 

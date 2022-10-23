@@ -2,7 +2,7 @@
  
 <script>
  
-    quantities = [-2,1,"cat",5,0];
+    quantities = [1,1,1,1,1];
  
     function isNonNegInt(queryString, returnErrors = false){
     errors = []; // assume no errors at first
@@ -18,6 +18,8 @@
             return false;
     }
     }
+
+
     function generate_item_rows(product_quantities_array){
       for(i=0; i<product_quantities_array.length; i++) {
         if(quantities[i]==0){
@@ -28,6 +30,8 @@
             extended_price = product_quantities_array[i] * products[i].price; 
            (subtotal += extended_price)
           } else {extended_price=0}
+
+
 
           
         document.write(`
@@ -58,6 +62,15 @@
     <title>Document</title>
 </head>
 <body>
+  <script>
+    params = (new URL(document.location)).searchParams;
+
+    for(i=0; i<quantities.length;i++){
+      quantities[i] = params.get(`quantity${i}`);
+      
+    }
+    </script>
+
     <table border="2">
         <tbody>
           <tr>
@@ -67,8 +80,12 @@
             <th style="text-align: center;" width="54%">extended price</th>
           </tr>
           <script>
+
+          
+
+
             generate_item_rows(quantities);{
-             
+
             };
  
  
