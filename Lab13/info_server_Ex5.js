@@ -42,19 +42,13 @@ app.get("/product_data.js", function (request, response, next) {
 
 app.post("/process_form", function (request, response) {
     var q = request.body['text1'];
-    if (typeof q != 'undefined') {
-        if (isNonNegInt(q)) { //we have a valid quantity
-            let brand = products[0]['brand'];
-            let brand_price = products[0]['price'];
-            products[0].total_sold += Number (q);
-
-            response.send(`Thank you for purchasing ${q} ${brand} at $${brand_price} each for a total of $${brand_price*q}`); //if it finds that in the request body, print the string
-    } else {
-        response.send(`${q} is not a valid quantity - hit the back button`);
-    }
-} else { 
-    response.send("Enter some quantities!");
-}
+        if (typeof q != 'undefined') {
+            if (isNonNegInt(q)) { //we have a valid quantity
+                response.redirect('receipt.html?quantity=' + q);
+            } else {
+                response.redirect('order_page.html?error=Invalid%20Quantity&quantity_textbox=' + q)
+            }
+        }
 
  });
  

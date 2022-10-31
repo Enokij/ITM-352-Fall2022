@@ -27,16 +27,11 @@
         }
     }
 
-        function checkQuantityTextbox(object) {
-            let input_string = object.value;
-            let error_array = isNonNegInt(input_string, true);
-            if(error_array.lenght == 0) {
-                qty_textbox_message.innerHTML = input_string;
-            } else {
-                qty_textbox_message.innerHTML = error_array.join(", ");
+        function checkQuantityTextbox(theTextbox) {
+                errs = isNonNegInt(theTextbox.value, true);
+                document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
             }
-            
-        }
+
         function display_purchase() {
             let value = document.getElementById('quantity_textbox').value;
         let validate = isNonNegInt(value);
@@ -67,25 +62,21 @@
 
 
     </script>
-    <form name="quantity_form" action="/process_form" method="POST" > 
-        <script>
-            for(i=0; i<products.length; i++){
-            document.write(`<h3>${products[i]["brand"]} at \$${products[i]["price"]}</h3>`);
-            document.write(`<h4>${products[i]["total_sold"]} ${products[i]["brand"]} have been sold!</h4>`);
-            }
+        <form name='quantity_form' action="process_form" method="POST">
+            <script>
+                for (i in products) {
+                    document.write(`<h3>${products[i]["brand"]} at \$${products[i]["price"]} (${products[i]["total_sold"]} sold)</h3>`);
+                    document.write(`
+            <label for="quantity_textbox">quantity desired:</label>
+            <input type="text" name="quantity_textbox[${i}]" onkeyup="checkQuantityTextbox(this);">
+            <span id="quantity_textbox[${i}]_message">Enter a quantity</span>
+            `);
+                }
             </script>
-        
-        <label>Quantity Desired</label>
-        <br>
-        <input type="text" onkeyup="checkQuantityTextbox(this);" id="textbox1" name="text1" >
-        </input>
-        <br>
-        <input type="text" onkeyup="checkQuantityTextbox(this);" id="textbox2" name="text2" >
-        </input>
-        <br>
-        <span id='qty_textbox_message'>Enter a quantity</span>
-        <br><input type="submit" value = "Purchase!"></input> 
-    </form>
+            <br>
+            <input type="submit" value='Purchase'>
+        </form>
+    
     <script>
             if (params.has('quantity_textbox')) { //makes the form "sticky"
     quantity_form["quantity_textbox"].value = params.get('quantity_textbox');
