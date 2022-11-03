@@ -1,0 +1,45 @@
+[
+
+    { "brand" : "Tofu65",
+      "price" : 200.00,
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/Tofu65.jpg",
+      "quantity_available" : 3,
+      "total_sold" : 0
+    },
+ 
+
+
+      {"brand" : "Solar",
+      "price" : 300.00,
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/Solar.jpg",
+      "quantity_available" : 2,
+      "total_sold" : 0
+      },
+ 
+
+ 
+      {"brand" : "Lunar 80",
+      "price" : 250.00,
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/Luna%2080.jpg",
+      "quantity_available" : 5,
+      "total_sold" : 0
+    },
+ 
+
+ 
+      {"brand" : "KBD75",
+      "price" : 145.00,
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/KBD75.jpg",
+      "quantity_available" : 9,
+      "total_sold" : 0
+         },
+ 
+
+ 
+      {"brand" : "D60LITE",
+      "price" : 210.00,
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/D60LITE.jpg",
+      "quantity_available" : 11,
+      "total_sold" : 0
+         }
+]
