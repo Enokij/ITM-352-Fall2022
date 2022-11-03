@@ -1,3 +1,8 @@
+// Author: Justin Enoki
+// Date: October 31, 2022
+// This file holds the different functions that display my product info and invoice on the main html 
+// web page. Also gives the main layout for the invoice.
+
 // create a variable to store the products 'database' in
 var products;
 
@@ -12,6 +17,7 @@ var products;
             return return_errors ? errors : (errors.length == 0);
         }
 
+        // Shows user if they are inputting an invalid integer or not, dynamically
         function checkQuantityTextbox(theTextbox) {
             errs = isNonNegInt(theTextbox.value, true);
             if (errs.length == 0) errs = ['You want:'];
@@ -23,7 +29,7 @@ var products;
 
 
 function display_invoice(invoice_data) {
-    // copy the hidden invoice into the main element
+    // displays the hidden invoice in the same html web page
     products_main_display.innerHTML = invoice_div.innerHTML;
 
     for (i = 0; i < products.length; i++) {
@@ -40,7 +46,7 @@ function display_invoice(invoice_data) {
   `;
         }
     }
-
+    // Table layout formatted from Invoice 3
     // add subtotal row
     newRow = document.getElementById("invoice_table").insertRow();
     newRow.innerHTML = `
@@ -69,6 +75,7 @@ function display_invoice(invoice_data) {
     document.getElementById("display_footer").innerHTML = '<input type="button" class="button" value="Return to Store" onclick="window.location.href = `products_store.html`;"></input>';
 }
 
+// function gathers the information from the purchase form and sends the response to the server
 function process_purchase() {
     data = new URLSearchParams(new FormData(product_form));
     fetch('/process_purchase', 

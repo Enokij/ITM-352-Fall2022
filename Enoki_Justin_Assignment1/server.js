@@ -24,11 +24,11 @@ app.use(myParser.urlencoded({ extended: true }));
         }
 
 
-//to track quantity sold
+// keeps track of quantity sold
 products.forEach((products,i) => {products.total_sold = 0});
 
 
-//monitor requests
+// monitors requests
 app.get("/products.js", function (req, res, next) {
     res.type('.js');
     var products_str = `var products = ${JSON.stringify(products)};`;
@@ -44,6 +44,7 @@ app.all('*', function (req, res, next) {
 
 
 app.post('/process_purchase', function (req, res, next) {
+    // Turns the data that was input from user and makes a string of it
     console.log(Date.now() + ': Purchase made from ip ' + req.ip + ' data: ' + JSON.stringify(req.body));
     invoice_data = invoice(req.body);
     res.json(invoice_data);
@@ -59,8 +60,8 @@ app.post('/process_purchase', function (req, res, next) {
         if (typeof numberOfProducts != 'undefined') {
             if (isNonNegInt(numberOfProducts) && numberOfProducts > 0) {  
                 // We have a valid quantity. Add to the ordered string.
-                products[i].total_sold += Number(numberOfProducts);
-                products[i].quantity_available -= Number(numberOfProducts);
+                products[i].total_sold += Number(numberOfProducts); //increase number of products sold
+                products[i].quantity_available -= Number(numberOfProducts); //decrease quantity available by how many items were purchased
                 goodQuantity = true; 
             } else {
                 // We have an invalid quantity. Set the valid flag to false.
@@ -75,10 +76,13 @@ app.post('/process_purchase', function (req, res, next) {
     next(); 
 });
 
+// routes all other GET requests to the public folder
 app.use(express.static('./public'));
 
+// start server
 var listener = app.listen(8080, () => { console.log('server listening on port ' + listener.address().port); });
 
+// calculates subtotal + invoice
 function invoice(quantities) {
     subtotal = 0;
     for (i = 0; i < products.length; i++) {
@@ -88,19 +92,15 @@ function invoice(quantities) {
             subtotal += a_qty * products[i].price;
         }
     }
-    // Compute tax
+    // Compute the tax
     var tax_rate = 0.0575;
     var tax = tax_rate * subtotal;
 
     // Compute shipping
-    if (subtotal <= 50) {
-        shipping = 2;
-    }
-    else if (subtotal <= 100) {
-        shipping = 5;
-    }
-    else {
-        shipping = 0.05 * subtotal; // 5% of subtotal
+    if (subtotal <= 500) {
+        shipping = 35;
+    } else {
+        shipping = 0.04 * subtotal; // 5% of subtotal
     }
 
     // Compute grand total

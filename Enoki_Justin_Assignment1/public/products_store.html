@@ -1,11 +1,18 @@
+<!--
+    Author: Justin Enoki
+    Date: October 31, 2022
+    This file creates the home html page to display all my products while doubling as showing my invoice
+    on the same html page.
+-->
+
 <script>
 var params = (new URL(document.location)).searchParams; // get the query string which has the form data
 
 // when the window loads check if the form was submitted and process the invoice, otherwise display 
 window.onload = function () {
-        // use fetch to retrieve it, and report any errors that occur in the fetch operation
-    // once the products have been successfully loaded and formatted as a JSON object
-    // using response.json(), run the initialize() function
+        // use fetch to retrieve the info and check if any errors occur
+        // once the products have been successfully loaded and formatted as a JSON object
+        // using response.json(), run the initialize() function
     fetch('products.json').then(function (response) {
         if (response.ok) {
             response.json().then(function (json) {
@@ -17,28 +24,27 @@ window.onload = function () {
         }
     });
     
-    // form was submitted so check that quantities are valid then redirect to invoice if ok.
+    // check to see that the form is submitted with valid quantities, then redirect to the invoice
     if (params.has('purchase_submit')) {
-        has_errors = false; // assume quantities are valid from the start
-        total_qty = 0; // need to check if something was selected so we will look if the total > 0
-        for (i = 0; i < products.length; i++) {
-            if (params.has(`quantity${i}`)) {
-                a_qty = params.get(`quantity${i}`);
-                // make textboxes sticky in case of invalid data
-                product_form[`quantity${i}`].value = a_qty;
-                total_qty += a_qty;
-                if (!isNonNegInt(a_qty)) {
-                    has_errors = true; // invalid quantity
-                    checkQuantityTextbox(product_form[`quantity${i}`]); // show where the error is
+        has_errors = false; // assume the quantities are valid from the start
+        total_qty = 0; //if the number increases, that means the user selected an item
+            for (i = 0; i < products.length; i++) {
+                if (params.has(`quantity${i}`)) {
+                    a_qty = params.get(`quantity${i}`);
+                    product_form[`quantity${i}`].value = a_qty; // make textboxes sticky 
+                    total_qty += a_qty;
+                    if (!isNonNegInt(a_qty)) {
+                        has_errors = true; // invalid quantity
+                        checkQuantityTextbox(product_form[`quantity${i}`]); // this will show where the error is
                 }
             }
         }
-        // Now respond to errors or redirect to invoice if all is ok
+        // if the user-inputted data is invalid, such as negative, alert user saying to enter valid quantities only
         if (has_errors) {
             alert("Please enter only valid quantities!");
-        } else if (total_qty == 0) { // no quantity selections, just give a general alert
+        } else if (total_qty == 0) { // no quantity entered, alert user to select a quantity
             alert("Please select some quantities!");
-        } else { // all good to go!
+        } else { // input is valid, can now display the invoice
 
             display_invoice();
         }
@@ -65,7 +71,7 @@ window.onload = function () {
         </header>
         <script>
                 function display_products() {
-         for (i = 0; i < products.length; i++) {
+         for (i = 0; i < products.length; i++) { //for loop to display my products
             products_main_display.innerHTML +=
             `
             <section class="item">
@@ -100,7 +106,7 @@ window.onload = function () {
     </form>
 
     <div id="invoice_div" style="display: none;">
-        <table border="3" id="invoice_table" width="100%">
+        <table border="3" id="invoice_table" width="100%"> <!--Set headers for invoice table-->
             <tbody>
                 <tr>
                     <th style="text-align: center;">Item</th>
@@ -116,9 +122,8 @@ window.onload = function () {
         </table>
         <div>
             <br><p>
-                OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
-                A subtotal $50 - $99.99 will be $5 shipping
-                Subtotals over $100 will be charged 5% of the subtotal amount
+                OUR SHIPPING POLICY IS: All shipments under $500 will have a flat rate shipping fee
+                of $35.00. Subtotals over $500 will be charged 4% of the subtotal amount
            </p></div>
     </div>
 </body>
