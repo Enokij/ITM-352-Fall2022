@@ -1,0 +1,27 @@
+th {
+    text-align: center;
+  }
+
+td {
+    text-align: center;
+}
+
+table {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    padding: 2rem 0rem 0rem 0rem;
+    max-width: 1100px;
+  }
+  
+  .table-cell {
+    box-sizing: border-box;
+    flex-grow: 1;
+    width: 100%;
+    padding: 0.8em 1.2em;
+    overflow: hidden;
+    list-style-type: none;
+    outline: 1px solid #ddd;
+    text-align: center;
+    font-weight: 300;
+}

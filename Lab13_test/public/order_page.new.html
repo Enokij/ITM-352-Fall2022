@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./product_data.js"></script>
+    <title>Order Stuff</title>
+</head>
+
+<body>
+    <script>
+        function isNonNegativeInteger(queryString, returnErrors = false) {
+            errors = []; // assume no errors at first
+            if (Number(queryString) != queryString) {
+                errors.push('Not a number!'); // Check if string is a number value
+            } else {
+                if (queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
+                if (parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
+            }
+            if (returnErrors) {
+                return errors;
+            } else if (errors.length == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function checkQuantityTextbox(the_object) {
+            let input_string = the_object.value;
+            let error_array = isNonNegativeInteger(input_string, true);
+            if (error_array.length == 0) {
+                qty_textbox_message.innerHTML = input_string;
+            } else {
+                qty_textbox_message.innerHTML = error_array.join("; ");
+            }
+        }
+
+        function displayPurchase() {
+            let value = document.getElementById('quantity_textbox').value;
+            let is_valid = isNonNegativeInteger(value);
+            if (is_valid) {
+                document.write(`Thank you for ordering ${value} things!`);
+            } /* else {
+                document.write(`Enter a valid quantity bozo!`);
+            }*/
+        }
+
+        let params = (new URL(document.location)).searchParams;
+        
+        console.log("Params=" + params);
+        // Check for an error and if so, pop up an alert to the user
+        if (params.has("error")) {
+            let err_msg = params.get("error");
+            alert(err_msg);
+        }
+    </script>
+
+    <form name="quantity_form" action="/process_form" method="POST">
+        <label>Buy Something!</label>
+        <BR>
+        <script>
+            document.write("<table border=1><tr><th>Name</th><th>Price</th><th>Sold</th><th>Quantity</th></tr>");
+            for (i=0; i<products.length; i++) {
+                document.write(`<tr><td>${products[i]["name"]}</td><td>\$${products[i]["price"]}</td>`);
+                document.write(`<td>${products[i]["total_sold"]}</td>`);
+                text_id = "textbox" + i;
+                text_name = "text" + i;
+                document.write(`<td><input type="text" onkeyup="checkQuantityTextbox(this);" id=${text_id} name=${text_name}
+        value="0"></input></td></tr>`);
+            }
+            document.write("</table>");
+        </script>
+
+        <BR><span id='qty_textbox_message'>Enter a quantity</span>
+        <BR><input type="submit" value="Purchase!" name="Submit"></input>
+    </form>
+
+    <script>
+        // Make the form sticky
+        if (params.has('quantity_textbox')) {
+            quantity_form["quantity_textbox"].value = params.get('quantity_textbox');
+            checkQuantityTextbox(quantity_form["quantity_textbox"]);
+        }
+    </script>
+</body>
+
+</html>

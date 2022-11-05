@@ -56,7 +56,7 @@ function display_invoice(invoice_data) {
     // add tax row
     newRow = document.getElementById("invoice_table").insertRow();
     newRow.innerHTML = `
-    <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @${100 * invoice_data.tax_rate}%</span></td>
+    <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @ ${100 * invoice_data.tax_rate}%</span></td>
     <td width="54%">\$${invoice_data.tax.toFixed(2)}</td>
     `;
     // add shipping row

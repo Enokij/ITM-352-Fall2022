@@ -38,6 +38,7 @@
 
 
             document.write(`Thank you for purchasing ${q} ${brand} at $${brand_price} each for a total of $${brand_price*q}`); //if it finds that in the request body, print the string
+            <input type="button" class="button" value="Return to Store" onclick= "window.location.href = `order_page.html`"></input>
     } else {
         document.write(`${q} is not a valid quantity - hit the back button`);
     }
