@@ -38,9 +38,18 @@ app.get("/use_session", function (request, response){
 
 app.get("/login", function (request, response) {
     // Give a simple login form
+    if (typeof request.session.last_login != 'undefined'){
+        login_time = "last login was" + request.session.last_login;
+    } else {
+        login_time = "first login";
+    }
+
+    my_cookie_name = request.cookies["username"]; // "grabbing" the cookie to be used
+
     str = `
 <body>
 <form action="" method="POST">
+login info: ${login_time} by ${my_cookie_name}<br>
 <input type="text" name="username" size="40" placeholder="enter username" ><br />
 <input type="password" name="password" size="40" placeholder="enter password"><br />
 <input type="submit" value="Submit" id="submit">
@@ -56,18 +65,25 @@ app.post("/login", function (request, response) {
     let user_name = POST["username"];
     let user_pass = POST["password"];
 
+
+
     console.log("User name=" + user_name + " password=" + user_pass);
     
     if (users[user_name] != undefined) {
         if (users[user_name].password == user_pass) {
-            response.send("Good login for user " + user_name);
+            if (typeof request.session.last_login != 'undefined'){
+            var msg = `you last logged in: ${request.session.last_login}`;
+            var now = new Date();
         } else {
-            response.redirect("/login?error='Bad password'");
+            var msg = ''
+            var now = "first visit";
         }
+        request.session.last_login = now; // creating a variable in the session, lives in the session
+        response.cookie('username', user_name).send(`${msg} <br> ${user_name} logged in ${now}` );
     } else {
-        response.redirect("/login?error='No such user'");
+        response.send('No such user');
     }
-
+}
 });
 
 app.get("/register", function (request, response) {

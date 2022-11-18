@@ -220,8 +220,8 @@ app.post("/process_register", function (request, response) { // this runs the re
     
     } else {
         request.body['registerError'] = JSON.stringify(registerError);
-        let params = new URLSearchParams(store_data);
-        response.redirect('register.html?' + ordered + params.toString()); // redirects back to login page if data is invalid
+        let params = new URLSearchParams(request.body);
+        response.redirect('./register.html?' + ordered + params.toString()); // redirects back to login page if data is invalid
     }
     
     });
