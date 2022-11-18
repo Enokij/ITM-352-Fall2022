@@ -27,8 +27,26 @@ spins:<span id="spins_span">10</span>
     <div>
         <aside>
             <div style="font-size:4rem;text-align:center;font-weight: bold;font-style: italic; color: white">
-                We sell from
-                around the globe!
+                <table border = "1">
+                <tr>
+                    <th style="text-align: center;" width="43%">Item</th>
+                    <th style="text-align: center;" width="11%">quantity</th>
+                </tr>
+                <script>
+                    document.write(`
+          <tr>
+            <td width="43%">${item1}</td>
+            <td align="center" width="11%">${quantity1}</td>
+            <td width="13%">\$${price1}</td>
+            <td width="54%">\$${extended_price1}</td>
+          </tr>
+          `);
+                    
+                    
+                </script>
+
+                </table>
+
             </div>
         </aside>
 

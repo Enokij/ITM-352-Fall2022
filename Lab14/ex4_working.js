@@ -80,7 +80,7 @@ app.get("/register", function (request, response) {
         users[user_name] = {};
         users[user_name].name = user_name;
         users[user_name].password = user_pass;
-        users[user_name].email = user_email;
+        users[user_name].email = user_email; 
         users[user_name].repeat_password = user_pass2;
 
         let data = JSON.stringify(users);
