@@ -250,7 +250,7 @@ app.post("/process_register", function (request, response) { // this runs the re
         response.redirect('./login.html?' + ordered + params.toString());
     });
 
-    app.post("/process_edit", function (request, response){ // runs the code for the edit info page
+    app.post("/process_edit", function (request, response){ // runs the code for the edit info page, similar to process_register, as it will varify the same emails, passwords, etc.
         var registerError = {}; // creates a storage for register edit errors
         console.log(request.body);
         register_username = request.body.username.toLowerCase();
