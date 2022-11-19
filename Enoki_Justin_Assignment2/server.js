@@ -138,7 +138,7 @@ app.post("/process_login", function (request, response) { // runs the login page
         request.query.LoginError = 'Invalid username!';
     }
     params = new URLSearchParams(request.query);
-    response.redirect('./login.html?' + params.toString()); // if there is an error during login, redirect back to login
+    response.redirect('./login.html?' + params.toString() + `username=${username}`); // if there is an error during login, redirect back to login
     
     });
 
@@ -219,7 +219,7 @@ app.post("/process_register", function (request, response) { // this runs the re
     if (Object.keys(registerError).length == 0) { // validates that the array that is being returned, which is the errors, is 0. If it is, redirect to invoice
         var email = request.body['email'].toLowerCase();
         users[email] = {};
-        users[email]["username"] = request.body['name'];
+        users[email]["name"] = request.body['name'];
         users[email]["password"] = encrypt(request.body['password']);
         
         
