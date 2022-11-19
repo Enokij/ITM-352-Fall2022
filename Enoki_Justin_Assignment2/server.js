@@ -77,6 +77,9 @@ app.post("/process_form", function (req, res){ // validates user inputs from the
             } else if (Number(qty) >= products[i].quantity_available) {
                 valid = false; // if the number ordered is more than what we have available, push an error and not let the user proceed
             }
+            if (qty > 0) { // means that they selected a quantity
+                var no_qty = true;
+            }
     }
 
     // create query string of all the quantities
@@ -85,13 +88,18 @@ app.post("/process_form", function (req, res){ // validates user inputs from the
     if(!valid_qty) {
         res.redirect('products_store.html?error=Enter a valid quantity.');
         }
+        if(typeof no_qty == 'undefined') {
+            res.redirect('products_store.html?error=Enter some quantity.');
+            }
         //if quantity available is less then the amount of quantity ordered, then redirect to error page
         if (!valid) {
             res.redirect('products_store.html?error=Not enough products in stock.');
         } else {
-            // If no errors are found, then redirect to the invoice page.
+            // If no errors are found, then redirect to the login page.
             store_data = qty_obj; // saves the data in store and stores it for later use
-            res.redirect('./login.html?' + ordered);
+            
+            let params = new URLSearchParams(req.body);
+            res.redirect('./login.html?' + params.toString());
         }
 
 });
@@ -117,9 +125,9 @@ app.post("/process_login", function (request, response) { // runs the login page
 
     if (typeof users[user_email] != 'undefined') { // makes sure that if the entered email matches one of the email's in the user_data.json
         if(users[user_email].password == encryptpass) { // validates if the input password matches the password in the server data base (user_data.json)
-            let params = new URLSearchParams(store_data); // searches for the store data from previous page and puts it in the params
+            let params = new URLSearchParams(request.query); // searches for the store data from previous page and puts it in the params
             params.append('username', users[user_email].name); // append the username to the params ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/append
-            
+            // params.append('quantity', store_data) // append the username to the params ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/append
             response.redirect('/invoice.html?' + ordered + params.toString()); // these appended variables are entered into the query string to bring that user input data to the next page
             return;
         } else {
@@ -130,7 +138,7 @@ app.post("/process_login", function (request, response) { // runs the login page
         request.query.LoginError = 'Invalid username!';
     }
     params = new URLSearchParams(request.query);
-    response.redirect('./login.html?' + ordered + params.toString()); // if there is an error during login, redirect back to login
+    response.redirect('./login.html?' + params.toString()); // if there is an error during login, redirect back to login
     
     });
 
@@ -146,10 +154,10 @@ app.post("/process_register", function (request, response) { // this runs the re
     // ref: https://www.w3schools.com/jsref/jsref_regexp_test.asp
     // code such as /^[A-Za-z]+$/ were used from that reference as well, along with formatting, comments on how they are used are below
     
-    // validate name
-    if (/^[A-Za-z]+$/.test(request.body.name)) { // use request.body.xxx to request the data from the inputted data in the registration form
+    // validate full name
+    if (/^[A-Za-z\s]*$/.test(request.body.name)) { // use request.body.xxx to request the data from the inputted data in the registration form
     } else {
-        registerError['name'] = 'Only letters allowed.'; // pushes an error that only allows letters in the full name
+        registerError['name'] = 'Only letters allowed.'; // pushes an error that only allows letters and spaces in the full name
     }
     
     if (request.body.name.length > 30 || request.body.name.length < 2) { // validates that their name is of sufficient length
@@ -258,7 +266,7 @@ app.post("/process_register", function (request, response) { // this runs the re
 
 
             // validate name
-    if (/^[A-Za-z]+$/.test(request.body.name)) { // use request.body.xxx to request the data from the inputted data in the registration form
+    if (/^[A-Za-z\s]*$/.test(request.body.name)) { // use request.body.xxx to request the data from the inputted data in the registration form
     } else {
         registerError['name'] = 'Only letters allowed.'; // pushes an error that only allows letters in the full name
     }
@@ -340,6 +348,13 @@ app.post("/process_register", function (request, response) { // this runs the re
     }
         
     });
+
+    app.post('/process_logout', function (request, response) {
+        ordered = ""; // sets the ordered variable back to 0 so it doesn't keep ordering what was previously ordered
+
+        response.redirect('/products_store.html?'); // directs the user back to the products store and logs them out
+    
+    })
 
 
 

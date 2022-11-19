@@ -148,12 +148,12 @@ function isNonNegInt(queryString, returnErrors = false) {
   </p></div>
 </div>
 
-
+<form method="POST" name="invoiceForm">
 <footer class="invoiceFooter">
     <h1>Thank you for shopping with us!<h1>
-    <input type="button" class="button" value="Log out and return to homepage" onclick="window.location.href = 'products_store.html'" style="margin:10px;"></input>
+    <input type="submit" class="button" value="Log out and return to homepage" onclick="invoiceForm.action='/process_logout'" style="margin:10px;"></input>
   
 </footer>
-
+</form>
 </body>
 </html>

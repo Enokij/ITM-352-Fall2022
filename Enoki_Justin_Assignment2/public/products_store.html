@@ -11,17 +11,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-</head>
-
-<form name="product_form" action="/process_form" method="POST">
-<body>
-    <header>
-        <h1>Justin's Keyboard Store</h1>
-    </header>
-
     <script>
-        //function code from previous labs checking if an integer is a valid integer or not.
-        function isNonNegInt(queryString, returnErrors = false) {
+                //function code from previous labs checking if an integer is a valid integer or not.
+                function isNonNegInt(queryString, returnErrors = false) {
             errors = []; //assume there are no errors to start
             if (queryString == '') q = 0; // this handles the blank inputs as if they are 0
             if (Number(queryString) != queryString) errors.push('<font color="red"><b>Not a number!</b></font>');
@@ -47,10 +39,16 @@
             if (theTextbox.value.trim() == '') errs = ['Quantity']; // if there is an error, replace the label 'quantity' with the error message
             document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", "); // prints out the error message
         }
+    </script>
+</head>
 
+<form name="product_form" action="/process_form" method="POST">
+<body onload="processError()">
+    <script>
         // grabs the parameters from the document, taken from Lab 13
         var params = (new URL(document.location)).searchParams;
 
+        function processError() {
         console.log("Params=" + params);
         if (params.has("error")){
             let error_msg = params.get("error");
@@ -80,6 +78,16 @@
         } 
         
     }
+}
+    </script>
+    <header>
+        <h1>Justin's Keyboard Store</h1>
+    </header>
+
+    <script>
+
+
+        
     </script>
 
     <main>
