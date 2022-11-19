@@ -67,7 +67,7 @@ app.post("/process_form", function (req, res){ // validates user inputs from the
     for (i = 0; i < products.length; i++){ // computes the user input of quantity and changes the number of inventory and products sold
         let qty_name = 'quantity' + i;
         let qty = req.body['quantity' + i];
-        if (qty == "") continue;
+        if (qty == "") continue; // if the quantity is 0 for that product, continue to the next product
             if (isNonNegInt(qty) && qty > 0 && Number(qty) <= products[i].quantity_available) {
                 products[i].quantity_available -= Number(qty); // decreases the inventory by how much the user bought
                 products[i].total_sold += Number(qty); // increases by how much the user bought
@@ -88,7 +88,7 @@ app.post("/process_form", function (req, res){ // validates user inputs from the
     if(!valid_qty) {
         res.redirect('products_store.html?error=Enter a valid quantity.');
         }
-        if(typeof no_qty == 'undefined') {
+        if(typeof no_qty == 'undefined') { // if all of the quantities were 0, meaning the user did not input anything, direct back to the products store page and push the error to enter in atleast one product to purchase
             res.redirect('products_store.html?error=Enter some quantity.');
             }
         //if quantity available is less then the amount of quantity ordered, then redirect to error page
@@ -117,8 +117,8 @@ if (fs.existsSync(fileName)) {
 }
 
 app.post("/process_login", function (request, response) { // runs the login page and validates data entered
-
-    var user_email = request.body.email; //grabs email to be appended to the query string after login is successful and the next page can use the new info in the query string, such as the username
+    // this code below also grabs the email in lower case, making the email INcase sensitive, meaning to matter if it's entered in upper or lower case, it will still go through
+    var user_email = request.body.email.toLowerCase(); //grabs email to be appended to the query string after login is successful and the next page can use the new info in the query string, such as the username
     var encryptpass = encrypt(request.body.password); // IR1 encrypts password they entered
     console.log(encryptpass);
     
@@ -127,7 +127,6 @@ app.post("/process_login", function (request, response) { // runs the login page
         if(users[user_email].password == encryptpass) { // validates if the input password matches the password in the server data base (user_data.json)
             let params = new URLSearchParams(request.query); // searches for the store data from previous page and puts it in the params
             params.append('username', users[user_email].name); // append the username to the params ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/append
-            // params.append('quantity', store_data) // append the username to the params ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/append
             response.redirect('/invoice.html?' + ordered + params.toString()); // these appended variables are entered into the query string to bring that user input data to the next page
             return;
         } else {
@@ -135,10 +134,10 @@ app.post("/process_login", function (request, response) { // runs the login page
             request.query.LoginError = 'Invalid password!' // if the password is incorrect, push an error and not let the user proceed
         }
     } else { 
-        request.query.LoginError = 'Invalid username!';
+        request.query.LoginError = 'Invalid email!'; // if the email entered is not in the data base, push an error saying the email is invalid and not let the user proceed
     }
     params = new URLSearchParams(request.query);
-    response.redirect('./login.html?' + params.toString() + `username=${username}`); // if there is an error during login, redirect back to login
+    response.redirect('./login.html?' + params.toString()); // if there is an error during login, redirect back to login
     
     });
 
@@ -242,7 +241,7 @@ app.post("/process_register", function (request, response) { // this runs the re
 
         if (typeof users[user_email] != 'undefined'){
             if (users[user_email].password == encryptpass) {
-                store_data['email'] = users[user_email.name];
+                store_data['email'] = users[user_email.name]; // stores the email in the store_data array
                 let params = new URLSearchParams(store_data); 
                 response.redirect('/edit.html?' + ordered + params.toString()); // if user login info is valid, direct to the edit page
                 return;
@@ -251,17 +250,17 @@ app.post("/process_register", function (request, response) { // this runs the re
                 request.query.LoginError = 'Invalid password' // if the password is wrong, do not proceed to edit page
             }
         } else {
-            request.query.LoginError = 'Invalid username' // if username is wrong, do not proceed to edit page
+            request.query.LoginError = 'Invalid email' 
         }
 
         params = new URLSearchParams(request.query);
-        response.redirect('./login.html?' + ordered + params.toString());
+        response.redirect('./login.html?' + ordered + params.toString()); // if email is wrong, do not proceed to edit page
     });
 
     app.post("/process_edit", function (request, response){ // runs the code for the edit info page, similar to process_register, as it will varify the same emails, passwords, etc.
         var registerError = {}; // creates a storage for register edit errors
         console.log(request.body);
-        register_username = request.body.username.toLowerCase();
+        register_username = request.body.username.toLowerCase(); // grabs username from previous page in lowercase
         register_email = request.body.email.toLowerCase();
 
 
@@ -327,7 +326,6 @@ app.post("/process_register", function (request, response) { // this runs the re
     // if the length of that array is more than 0, that means there is an error
     // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
     if (Object.keys(registerError).length == 0) { // validates that the array that is being returned, which is the errors, is 0. If it is, redirect to invoice
-        let user_email = request.body.email; //grabs username from user_data.json
 
         // delete users[store_data['username']]
         var email = request.body['email'].toLowerCase();
