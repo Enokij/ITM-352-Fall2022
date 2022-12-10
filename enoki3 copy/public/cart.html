@@ -1,0 +1,123 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="homepage.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <script src="./functions.js"></script>
+    <script>
+        var products_data;
+        var subtotal = 0;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+        });
+
+
+    </script>
+</head>
+
+<body>
+
+    <ul>
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="login">Login</a></li>
+        <li><a href="register">Register</a></li>
+        <li class="dropdown">
+            <a href="javascript:void(0)" class="dropbtn">Products</a>
+            <div class="dropdown-content">
+                <a href='./products.html?products_key=keyboards'>Keyboards</a>
+                <a href='./products.html?products_key=switches'>Switches</a>
+                <a href='./products.html?products_key=keycaps'>Keycaps</a>
+            </div>
+        </li>
+        <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+    </ul>
+    <h2>You have in your shopping cart:</h2>
+    <table border>
+        <th>Quantity</th>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Extended Price</th>
+
+
+        <script>
+
+            for (product_key in products_data) {
+                for (i = 0; i < products_data[product_key].length; i++) {
+                    if (typeof shopping_cart[product_key] == 'undefined') continue;
+                    qty = shopping_cart[product_key][i];
+                    extended_price = qty * products_data[product_key][i].price;
+                    (subtotal += extended_price)
+                    if (qty > 0) {
+                        document.write(`
+        <tr>
+          <td>${products_data[product_key][i].brand} <img src="${products_data[product_key][i].image}" style="width: 40px; height: 40px;"></td>
+          <td>
+            <center>
+              <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?index=${i}'">+</button>
+              <input type="text" id="textbox" value="${qty}" style="width: 20px">
+              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?index=${i}'">-</button>
+            </center>
+          </td>
+          <td>\$${products_data[product_key][i].price.toFixed(2)}</td>
+          <td>\$${extended_price}</td>
+          <tr>
+        </form>
+      `);
+                    }
+                }
+            }
+
+            var tax_rate = 0.0575;
+            var tax = tax_rate * subtotal;
+
+            // Compute shipping
+            if (subtotal <= 500) {
+                shipping = 35;
+            } else {
+                shipping = 0.04 * subtotal; // 4% of subtotal
+            }
+
+            // Compute grand total
+            var total = subtotal + tax + shipping;
+
+        </script>
+
+        <tr>
+            <td colspan="4" width="100%"></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Sub-total</td>
+            <td width="54%">$
+                <script>document.write(subtotal.toFixed(2));</script>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Tax @
+                <script>document.write(100 * tax_rate);</script>%</span>
+            </td>
+            <td width="54%">$
+                <script>document.write(tax.toFixed(2));</script>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Shipping</td>
+            <td width="54%">$
+                <script>document.write(shipping.toFixed(2));</script>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center;" colspan="3" width="67%"><strong>Total</strong></td>
+            <td width="54%"><strong>$
+                    <script>document.write(total.toFixed(2));</script>
+                </strong></td>
+        </tr>
+
+
+    </table>
+</body>

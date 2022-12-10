@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./functions.js"></script>
+    <link href="homepage.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <title>Justin's Keyboard Store</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        img {
+            border: 1px solid #ddd;
+            /* Gray border */
+            border-radius: 4px;
+            /* Rounded border */
+            padding: 5px;
+            /* Some padding */
+            width: 300px;
+            /* Set a small width */
+        }
+
+        img:hover {
+            box-shadow: 0 0 5px 1px black;
+        }
+    </style>
+    <script>
+        var products_data;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
+
+        // get the query string
+        let params = (new URL(document.location)).searchParams;
+        if (params.has('products_key')) {
+            var this_product_key = params.get('products_key');
+        } else {
+            document.write('no products key in query string');
+            document.stop;
+        }
+
+    </script>
+</head>
+
+<form name="product_form" action="/process_form" method="POST"></form>
+<body>
+    
+    <ul>
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./login.html">Login</a></li>
+        <li><a href="./register.html">Register</a></li>
+        <li class="dropdown">
+          <a href="javascript:void(0)" class="dropbtn">Products</a>
+          <div class="dropdown-content">
+            <script>
+            document.write(`<a href='./products.html?products_key=keyboards'>Keyboards`);
+            document.write(`<a href='./products.html?products_key=switches'>Switches`);
+            document.write(`<a href='./products.html?products_key=keycaps'>Keycaps`);
+        </script>
+          </div>
+        </li>
+        <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+      </ul>
+    
+<main>
+    <script>
+    var order_str = '';
+
+    order_str += `<h1>Please select what ${this_product_key} you want</h1><br>`;
+    // We put the whole table in the form so that anything entered in it will get submitted
+    order_str += `<FORM action="/add_to_cart" method="GET">
+                <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}">`;
+    products = products_data[this_product_key];
+    for (i = 0; i < products.length; i++) {
+        order_str += 
+        `<TR>
+        <TD><img src="${products[i]['image']}"</TD>
+        <br>
+        <TD>${products[i]['brand']}</TD>
+        <br>
+        <TD>$${products[i]['price']}</TD>
+        <br>
+        <TD>
+        <INPUT TYPE="TEXT"  name="quantities[${i}]" value="${(typeof shopping_cart[this_product_key]!='undefined')?shopping_cart[this_product_key][i]:0}"></TD><br><br></TR>`;
+    }
+    order_str += `</TABLE><br>
+    <INPUT TYPE="SUBMIT"  name="Submit" value="Select">
+    </FORM>`;
+    document.write(order_str);
+    </script>
+</main>
+</body>
+</form>
+</html>

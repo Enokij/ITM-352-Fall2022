@@ -2,7 +2,7 @@ products = [
 
     { "brand" : "Tofu65",
       "price" : 200.00,
-      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/Tofu65.jpg",
+      "image" : "https://raw.githubusercontent.com/Enokij/hello-world/main/pictures/Cherry%20Silver.jpg",
    
     },
  

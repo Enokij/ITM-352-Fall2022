@@ -14,24 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script>
-                //function code from previous labs checking if an integer is a valid integer or not.
-                function isNonNegInt(queryString, returnErrors = false) {
-            errors = []; //assume there are no errors to start
-            if (queryString == '') q = 0; // this handles the blank inputs as if they are 0
-            if (Number(queryString) != queryString) errors.push('<font color="red"><b>Not a number!</b></font>');
-            else if(queryString < 0) errors.push('<font color="red"><b>Negative value!</b></font>');
-            else if (queryString == 0) errors.push('<font color="red"><b>Select a quantity!</b></font>');
-            else if (queryString > quantity_available) errors.push('<font color="red"><b>Not enough in stock!</b></font>')
-            else if (parseInt(queryString) != queryString) errors.push('<font color="red"><b>Not an integer!</b></font>');
-            
-            if (returnErrors) {
-                return errors;
-            } else if (errors.length == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+
 
         // taken from Lab 13, credit to Port/Kazman
         // Shows user if they are inputting an invalid integer or not, dynamically
