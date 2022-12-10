@@ -225,7 +225,7 @@ app.get("/decrease_quantity", function(request, response) {
   var product_key = request.query.product_key;
 
   // Increase the value of the item in the array by 1
-  increaseQuantity(request, products_key, productId, product_key, products_data);
+  decreaseQuantity(request, products_key, productId, product_key, products_data);
 
   // Redirect the user back to the shopping cart page
   response.redirect("./cart.html");
