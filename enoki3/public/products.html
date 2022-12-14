@@ -34,6 +34,7 @@
     <script>
         var products_data;
         total = 0;
+        var cookie;
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products_data = JSON.parse(response);
@@ -51,6 +52,7 @@
          // Parsing JSON string into object
          cookie = JSON.parse(response);
         });
+        
 
         // get the query string
         let params = (new URL(document.location)).searchParams;

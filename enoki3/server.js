@@ -166,8 +166,10 @@ app.post("/login", function (request, response) {
 });
 
 app.get('/logout', (request, response) => {
-  // Destroy the cookie
-  response.clearCookie('your_cookie_name');
+  // Destroy the cookie's created from login
+  response.clearCookie('email');
+  response.clearCookie('loggedIn');
+  response.clearCookie('cart');
   // Destroy the session
   request.session.destroy(() => {
     // Redirect the user to the login page
