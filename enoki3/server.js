@@ -155,9 +155,9 @@ app.post("/login", function (request, response) {
             loggedIn=true;
         }
         request.session.last_login = now; // creating a variable in the session, lives in the session
-        response.cookie("email", user_email);
-        response.cookie('loggedIn', loggedIn)
-        response.cookie('cart', request.session.cart)
+        response.cookie('email', user_email);
+        response.cookie('loggedIn', loggedIn);
+        response.cookie('cart', request.session.cart);
         response.redirect('./index.html');        
     } else {
         response.send('No such user');
@@ -179,7 +179,7 @@ app.get('/logout', (request, response) => {
 
 app.get("/register", function (request, response) {
     // Give a simple register form
-    str = `
+    let str = `
     <!DOCTYPE html>
     <html lang="en">
     
@@ -209,8 +209,8 @@ app.get("/register", function (request, response) {
 </ul>
 <form action="/register" method="POST">
 <h1>Create your account here!</h1>
-<input type="text" id="username" name="username" size="40" placeholder="enter username" ><br />
-<input type="password" id="password name="password" size="40" placeholder="enter password"><br />
+<input type="text" id="name" name="name" size="40" placeholder="enter username" ><br />
+<input type="password" id="password" name="password" size="40" placeholder="enter password"><br />
 <input type="password" id="repeat_password" name="repeat_password" size="40" placeholder="enter password again"><br />
 <input type="email" id="email" name="email" size="40" placeholder="enter email"><br />
 <input type="submit" value="Submit" id="submit">
@@ -224,25 +224,26 @@ app.get("/register", function (request, response) {
  app.post("/register", function (request, response) {
     // process a simple register form
     registerError = {};
-    register_username = request.body.username.toLowerCase();
-    register_email = request.body.email.toLowerCase();
+    var register_name = request.body.name.toLowerCase();
+    var user_email = request.body['email'].toLowerCase();
+    var register_email = request.body['email'].toLowerCase();
     
     // validate username
     if (/^[0-9a-zA-Z]+$/.test(request.body.username)) { // validates if their username only has letters and numbers. ref: https://www.w3resource.com/javascript/form/javascript-sample-registration-form-validation.php
     } else {
-        registerError['username'] = 'Username can only contain numbers and letters.'
+        registerError['name'] = 'Username can only contain numbers and letters.'
     }
     
-    if (request.body.username > 20 || request.body.username < 2){ // validates if the username if of sufficient length
-        registerError['username'] = 'Username must be at least 2 characters and less than 30.'; // validates the username is long enough but not too long
+    if (request.body.name > 20 || request.body.name < 2){ // validates if the username if of sufficient length
+        registerError['name'] = 'Username must be at least 2 characters and less than 30.'; // validates the username is long enough but not too long
     }
     
-    if (typeof users[register_username] != 'undefined') {
-        registerError['username'] = 'Username taken!'; // validates if there already is a user registered with that username
+    if (typeof users[register_name] != 'undefined') {
+        registerError['name'] = 'Username taken!'; // validates if there already is a user registered with that username
     }
     
-    if (typeof users[register_username] == "") {
-        registerError['username'] = 'Please enter a username.'; // makes sure they enter a username if they left it blank
+    if (typeof users[register_name] == "") {
+        registerError['name'] = 'Please enter a username.'; // makes sure they enter a username if they left it blank
     }
     
     // validate email
@@ -280,20 +281,25 @@ app.get("/register", function (request, response) {
     // used object.keys for the array to check that errors equal to zero
     // ref for objectkeys: https://www.w3schools.com/jsref/jsref_object_keys.asp
     if (Object.keys(registerError).length == 0) { // validates that the array that is being returned, which is the errors, is 0. If it is, redirect to invoice
-        var email = request.body['email'].toLowerCase();
-        users[email] = {};
-        users[email]["username"] = request.body['username'];
-        users[email]["password"] = encrypt(request.body['password']);
-        users[email].num_loggedIn = 0;
-        users[email].last_login = Date();
+        users[register_email] = {};
+        users[register_email]["name"] = request.body["name"];
+        users[register_email]["password"] = encrypt(request.body['password']);
+        users[register_email].num_loggedIn = 0;
+        users[register_email].last_login = Date();
+        loggedIn=true;
         
         // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
         fs.writeFileSync(fname, JSON.stringify(users), "utf-8"); 
+        response.cookie('email', user_email);
+        response.cookie('loggedIn', loggedIn);
+        response.cookie('cart', request.session.cart);
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
         response.redirect('./index.html'); 
     } else {
         request.body['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
+        let params = new URLSearchParams(request.body);
         response.redirect('register'); // then we will redirect them to the register if they have errors
+        console.log(params.toString());
     }
     });
 

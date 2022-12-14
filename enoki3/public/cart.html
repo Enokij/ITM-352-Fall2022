@@ -64,6 +64,7 @@
         <script>
                 ifLoggedIn = cookie.loggedIn;
                 user_email = cookie.email;
+                cart_total.innerHTML = total;
                 // Check if the user is logged in
                 if (ifLoggedIn) {
                     // Select the login link element
@@ -73,9 +74,9 @@
                     loginLink.setAttribute('href', '/logout');
                     profileInfo.setAttribute('href', './user_update.html');
                     loginLink.innerHTML = 'Logout';
-                    profileInfo.innerHTML = user_data[user_email].name;
+                    profileInfo.innerHTML = user_data[user_email].username;
                 }
-            cart_total.innerHTML = total;
+            
             for (product_key in products_data) {
                 for (i = 0; i < products_data[product_key].length; i++) {
                     if (typeof shopping_cart[product_key] == 'undefined') continue;
