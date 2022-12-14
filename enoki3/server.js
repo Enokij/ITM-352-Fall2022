@@ -227,6 +227,7 @@ app.get("/register", function (request, response) {
     var register_name = request.body.name.toLowerCase();
     var user_email = request.body['email'].toLowerCase();
     var register_email = request.body['email'].toLowerCase();
+    var loggedIn = false;
     
     // validate username
     if (/^[0-9a-zA-Z]+$/.test(request.body.username)) { // validates if their username only has letters and numbers. ref: https://www.w3resource.com/javascript/form/javascript-sample-registration-form-validation.php
@@ -286,15 +287,18 @@ app.get("/register", function (request, response) {
         users[register_email]["password"] = encrypt(request.body['password']);
         users[register_email].num_loggedIn = 0;
         users[register_email].last_login = Date();
-        loggedIn=true;
+        console.log("name: " + request.body["name"]);
+        
         
         // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
         fs.writeFileSync(fname, JSON.stringify(users), "utf-8"); 
         response.cookie('email', user_email);
+        loggedIn=true;
         response.cookie('loggedIn', loggedIn);
         response.cookie('cart', request.session.cart);
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
-        response.redirect('./index.html'); 
+        response.send(`You have successfully been registered!<br><button type="button" style="position: absolute; right: 50%;" id="continue_shopping"
+        onclick="window.location.href = 'index.html'">Start shopping</button>`); 
     } else {
         request.body['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
         let params = new URLSearchParams(request.body);
