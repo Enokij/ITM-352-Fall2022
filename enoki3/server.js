@@ -209,10 +209,10 @@ app.get("/register", function (request, response) {
 </ul>
 <form action="/register" method="POST">
 <h1>Create your account here!</h1>
-<input type="text" name="username" size="40" placeholder="enter username" ><br />
-<input type="password" name="password" size="40" placeholder="enter password"><br />
-<input type="password" name="repeat_password" size="40" placeholder="enter password again"><br />
-<input type="email" name="email" size="40" placeholder="enter email"><br />
+<input type="text" id="username" name="username" size="40" placeholder="enter username" ><br />
+<input type="password" id="password name="password" size="40" placeholder="enter password"><br />
+<input type="password" id="repeat_password" name="repeat_password" size="40" placeholder="enter password again"><br />
+<input type="email" id="email" name="email" size="40" placeholder="enter email"><br />
 <input type="submit" value="Submit" id="submit">
 </form>
 </body>
@@ -222,80 +222,68 @@ app.get("/register", function (request, response) {
  });
 
  app.post("/register", function (request, response) {
-
     // process a simple register form
-    let POST = request.body;
-    console.log(POST);
-    let encryptedPass = encrypt(POST["password"]);
-    let registerError = {};
-     user_name = POST["username"].toLowerCase();
-     user_pass = POST["password"];
-     user_pass2 = POST["repeat_password"];
-     user_email = POST["email"].toLowerCase();
-
-         // validate register form codes
-    // use .test to match the pattern with the result, or more specifically match the rules to the requested data
-    // ref: https://www.w3schools.com/jsref/jsref_regexp_test.asp
-    // code such as /^[A-Za-z]+$/ were used from that reference as well, along with formatting, comments on how they are used are below
+    registerError = {};
+    register_username = request.body.username.toLowerCase();
+    register_email = request.body.email.toLowerCase();
     
     // validate username
-    if (/^[0-9a-zA-Z]+$/.test(POST.user_name)) { // validates if their username only has letters and numbers. ref: https://www.w3resource.com/javascript/form/javascript-sample-registration-form-validation.php
+    if (/^[0-9a-zA-Z]+$/.test(request.body.username)) { // validates if their username only has letters and numbers. ref: https://www.w3resource.com/javascript/form/javascript-sample-registration-form-validation.php
     } else {
         registerError['username'] = 'Username can only contain numbers and letters.'
     }
     
-    if (POST.user_name.length > 20 || POST.user_name.length < 2){ // validates if the username if of sufficient length
+    if (request.body.username > 20 || request.body.username < 2){ // validates if the username if of sufficient length
         registerError['username'] = 'Username must be at least 2 characters and less than 30.'; // validates the username is long enough but not too long
     }
     
-    if (typeof users[user_name] != 'undefined') {
+    if (typeof users[register_username] != 'undefined') {
         registerError['username'] = 'Username taken!'; // validates if there already is a user registered with that username
     }
     
-    if (typeof users[user_name] == "") {
+    if (typeof users[register_username] == "") {
         registerError['username'] = 'Please enter a username.'; // makes sure they enter a username if they left it blank
     }
     
     // validate email
     // if statement below is used to ensure the email is formatted correctly by only allowing certain letters and symbols, such as the @ symbol
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(POST.email)) { // ref: https://www.w3resource.com/javascript/form/email-validation.php ; used their validation expression
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(request.body.email)) { // ref: https://www.w3resource.com/javascript/form/email-validation.php ; used their validation expression
     } else {
         registerError['email'] = 'Enter valid email.'; // pushes error if they entered an invalid email
     }
 
-    if (typeof users[user_email] != 'undefined') {
+    if (typeof users[register_email] != 'undefined') {
         registerError['email'] = 'Email already in use!'; // validates if there already is a user registered with that email
     }
     
     // validate password
-    if (POST.password.length < 10) {
+    if (request.body.password < 10) {
         registerError['password'] = 'Password must be longer than 10 characters'; // can't have a password less than 10 letters
     }
 
     // IR2 & 3
     // strong password filter refrenced from: https://stackoverflow.com/questions/12090077/javascript-regular-expression-password-validation-having-special-characters
-    if (/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,16}$/.test(POST.password)) {
+    if (/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,16}$/.test(request.body.password)) {
     } else {
         registerError['password'] = "Password must include at least one number and one special character"; //Error message pops upp if password does not contain at least one number or special character
     }
     
-    if (POST.password.length > 16) {
+    if (request.body.password > 16) {
         registerError['password'] = 'Password can not be longer than 16 characters.'; // validates that the password isn't longer than 16 letters
     }
     
-    if (POST.password != POST.password2) {
-        registerError['password2'] = 'Passwords do not match.'; // makes sure the password and repeated password match
+    if (request.body.password != request.body.repeat_password) {
+        registerError['repeat_password'] = 'Passwords do not match.'; // makes sure the password and repeated password match
     }
 
    
     // used object.keys for the array to check that errors equal to zero
     // ref for objectkeys: https://www.w3schools.com/jsref/jsref_object_keys.asp
-    if (Object.keys(registerError).length == 0) { 
-        var email = POST['email'].toLowerCase();
+    if (Object.keys(registerError).length == 0) { // validates that the array that is being returned, which is the errors, is 0. If it is, redirect to invoice
+        var email = request.body['email'].toLowerCase();
         users[email] = {};
-        users[email].name = POST['username'];
-        users[email]["password"] = encryptedPass;
-        users[email]["email"] = POST['email'];
+        users[email]["username"] = request.body['username'];
+        users[email]["password"] = encrypt(request.body['password']);
         users[email].num_loggedIn = 0;
         users[email].last_login = Date();
         
@@ -304,8 +292,8 @@ app.get("/register", function (request, response) {
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
         response.redirect('./index.html'); 
     } else {
-        POST['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
-        response.redirect('register?' + order_str); // then we will redirect them to the register if they have errors
+        request.body['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
+        response.redirect('register'); // then we will redirect them to the register if they have errors
     }
     });
 
