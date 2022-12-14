@@ -11,6 +11,7 @@
         var subtotal = 0;
         total = 0;
         var cookie;
+        var user_data;
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products_data = JSON.parse(response);
@@ -25,6 +26,10 @@
         loadJSON('get_cookies', function (response) {
             // Parsing JSON string into object
             cookie = JSON.parse(response);
+        });
+
+        loadJSON('get_users', function (response){
+            user_data = JSON.parse(response);
         });
 
 
@@ -57,15 +62,19 @@
 
 
         <script>
-            ifLoggedIn = cookie.loggedIn;
-            // Check if the user is logged in
-            if (ifLoggedIn) {
-                // Select the login link element
-                var loginLink = document.querySelector('a[href="/login"]');
-                // Update the login link element to display the logout link
-                loginLink.setAttribute('href', '/logout');
-                loginLink.innerHTML = 'Logout';
-            }
+                ifLoggedIn = cookie.loggedIn;
+                user_email = cookie.email;
+                // Check if the user is logged in
+                if (ifLoggedIn) {
+                    // Select the login link element
+                    var loginLink = document.querySelector('a[href="/login"]');
+                    var profileInfo = document.querySelector('a[href="/register"]');
+                    // Update the login link element to display the logout link
+                    loginLink.setAttribute('href', '/logout');
+                    profileInfo.setAttribute('href', './user_update.html');
+                    loginLink.innerHTML = 'Logout';
+                    profileInfo.innerHTML = user_data[user_email].name;
+                }
             cart_total.innerHTML = total;
             for (product_key in products_data) {
                 for (i = 0; i < products_data[product_key].length; i++) {

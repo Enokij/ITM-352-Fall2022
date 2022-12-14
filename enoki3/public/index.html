@@ -60,7 +60,7 @@
 
     </script>
 </head>
-<!--this will Brink customer into the store-->
+<!--this will Bring customer into the store-->
 <body>
     <ul>
         <li><a href="./index.html">Home</a></li>
@@ -80,14 +80,19 @@
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
       </ul>
       <script>
-                    ifLoggedIn = cookie.loggedIn;
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
             // Check if the user is logged in
             if (ifLoggedIn) {
                 // Select the login link element
                 var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
                 // Update the login link element to display the logout link
                 loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
                 loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+                document.write('<h2>Welcome ' + user_data[user_email].name + `!</h2>`)
             }
       </script>
     <h1>Justin's Keyboard Store</h1>

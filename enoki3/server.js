@@ -135,7 +135,7 @@ app.get("/login", function (request, response) {
 app.post("/login", function (request, response) {
     // Process login form POST and redirect to logged in page if ok, back to login page if not
     let POST = request.body;
-    user_email = POST["email"];
+    user_email = POST["email"].toLowerCase();
     var user_pass = encrypt(request.body.password); // uses my encryption function to encrypt the users entered password
     loggedIn = false;
     
@@ -158,7 +158,7 @@ app.post("/login", function (request, response) {
         response.cookie("email", user_email);
         response.cookie('loggedIn', loggedIn)
         response.cookie('cart', request.session.cart)
-        response.redirect('./cart.html');        
+        response.redirect('./index.html');        
     } else {
         response.send('No such user');
     }
@@ -208,6 +208,7 @@ app.get("/register", function (request, response) {
 <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
 </ul>
 <form action="/register" method="POST">
+<h1>Create your account here!</h1>
 <input type="text" name="username" size="40" placeholder="enter username" ><br />
 <input type="password" name="password" size="40" placeholder="enter password"><br />
 <input type="password" name="repeat_password" size="40" placeholder="enter password again"><br />
@@ -226,16 +227,70 @@ app.get("/register", function (request, response) {
     let POST = request.body;
     console.log(POST);
     let encryptedPass = encrypt(POST["password"]);
-    let reg_error = {};
-     user_name = POST["username"];
+    let registerError = {};
+     user_name = POST["username"].toLowerCase();
      user_pass = POST["password"];
-     user_email = POST["email"];
      user_pass2 = POST["repeat_password"];
+     user_email = POST["email"].toLowerCase();
+
+         // validate register form codes
+    // use .test to match the pattern with the result, or more specifically match the rules to the requested data
+    // ref: https://www.w3schools.com/jsref/jsref_regexp_test.asp
+    // code such as /^[A-Za-z]+$/ were used from that reference as well, along with formatting, comments on how they are used are below
+    
+    // validate username
+    if (/^[0-9a-zA-Z]+$/.test(POST.user_name)) { // validates if their username only has letters and numbers. ref: https://www.w3resource.com/javascript/form/javascript-sample-registration-form-validation.php
+    } else {
+        registerError['username'] = 'Username can only contain numbers and letters.'
+    }
+    
+    if (POST.user_name.length > 20 || POST.user_name.length < 2){ // validates if the username if of sufficient length
+        registerError['username'] = 'Username must be at least 2 characters and less than 30.'; // validates the username is long enough but not too long
+    }
+    
+    if (typeof users[user_name] != 'undefined') {
+        registerError['username'] = 'Username taken!'; // validates if there already is a user registered with that username
+    }
+    
+    if (typeof users[user_name] == "") {
+        registerError['username'] = 'Please enter a username.'; // makes sure they enter a username if they left it blank
+    }
+    
+    // validate email
+    // if statement below is used to ensure the email is formatted correctly by only allowing certain letters and symbols, such as the @ symbol
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(POST.email)) { // ref: https://www.w3resource.com/javascript/form/email-validation.php ; used their validation expression
+    } else {
+        registerError['email'] = 'Enter valid email.'; // pushes error if they entered an invalid email
+    }
+
+    if (typeof users[user_email] != 'undefined') {
+        registerError['email'] = 'Email already in use!'; // validates if there already is a user registered with that email
+    }
+    
+    // validate password
+    if (POST.password.length < 10) {
+        registerError['password'] = 'Password must be longer than 10 characters'; // can't have a password less than 10 letters
+    }
+
+    // IR2 & 3
+    // strong password filter refrenced from: https://stackoverflow.com/questions/12090077/javascript-regular-expression-password-validation-having-special-characters
+    if (/^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,16}$/.test(POST.password)) {
+    } else {
+        registerError['password'] = "Password must include at least one number and one special character"; //Error message pops upp if password does not contain at least one number or special character
+    }
+    
+    if (POST.password.length > 16) {
+        registerError['password'] = 'Password can not be longer than 16 characters.'; // validates that the password isn't longer than 16 letters
+    }
+    
+    if (POST.password != POST.password2) {
+        registerError['password2'] = 'Passwords do not match.'; // makes sure the password and repeated password match
+    }
 
    
     // used object.keys for the array to check that errors equal to zero
     // ref for objectkeys: https://www.w3schools.com/jsref/jsref_object_keys.asp
-    if (Object.keys(reg_error).length == 0) { 
+    if (Object.keys(registerError).length == 0) { 
         var email = POST['email'].toLowerCase();
         users[email] = {};
         users[email].name = POST['username'];
@@ -247,11 +302,10 @@ app.get("/register", function (request, response) {
         // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
         fs.writeFileSync(fname, JSON.stringify(users), "utf-8"); 
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
-        response.redirect('/login?' + order_str + '&' + `username=${user_name}` + '&' + `date=${users[email].last_login}`); 
+        response.redirect('./index.html'); 
     } else {
-        POST['reg_error'] = JSON.stringify(reg_error); // if there are errors we want to create a string 
-        let params = new URLSearchParams(POST);
-        response.redirect('register?' + order_str + params.toString()); // then we will redirect them to the register if they have errors
+        POST['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
+        response.redirect('register?' + order_str); // then we will redirect them to the register if they have errors
     }
     });
 
