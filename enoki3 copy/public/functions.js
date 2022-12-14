@@ -11,9 +11,3 @@ function loadJSON(service, callback) {
     };
     xobj.send(null);  
  }
-
-     // Define the increaseQuantity() function
-    function increaseQuantity(index) {
-        // Increase the value of the item in the array by 1
-        request.session.cart[products_key][index] += 1;
-     }

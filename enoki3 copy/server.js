@@ -4,13 +4,30 @@ var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 var session = require('express-session');
 var products_data = require('./products.json');
+order_str = "";
+// Require the ejs package
+var ejs = require('ejs');
 
-app.use(session({secret: "MySecretKey", resave: true, saveUninitialized: true}));
+// Set up ejs as the view engine
+app.set('view engine', 'ejs');
+
+
+app.use(session(
+    {secret: "MySecretKey", 
+    resave: false, 
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 50000,
+        httpOnly: true,
+        secure: false,
+        signed: true
+    }
+}));
 
 var fs = require('fs');
 var fname = "user_data.json"
 
-const crypto = require('crypto'); // used to encrypt password IR1
+const crypto = require('crypto'); // used to encrypt password, taken from my assignment2
 const algorithm = 'aes-256-cbc'; // defines the encryption algorithm
 const key = 'asdfasdfasdfasdfasdfasdfasdfasdf'; // defines the key used in the algorithm, it is set so that each unique password has a specified encryption attached to it
 const iv = 'asdfasdfasdfasdf'; // defines the initializing variable at its initial state, this is set instead of a randomByte method so that everytime you enter the same password, it will encyrpt as the same encrytion data. Used to match passwords when logging in
@@ -22,14 +39,6 @@ function encrypt(text) { // this function encrypts text such as passwords
     return encrypted.toString('hex'); // returns the encrypted password as a string so that it can be compared to the user input password
 }
 
-/*
-function nav_bar(this_product_key, products_data) {
-    // This makes a navigation bar to other product pages
-    for (let products_key in products_data) {
-        if (products_key == this_product_key) continue;
-    }
-}
-*/
 
 // routes all other GET requests to files in the public folder
 app.use(express.static(__dirname + '/public'));
@@ -53,10 +62,8 @@ app.all('*', function (request, response, next) {
 
 
 
-app.get("/use_cookie", function (request, response){
-    let my_cookie = request.cookies["my name"];
-    response.send("welcome to the use cookie page " + my_cookie);
-    // uses the session, but when the cookie times out, the my name variable will be undefined
+app.get("/get_cookies", function (request, response) {
+    response.json(request.cookies);
 });
 
 app.get("/use_session", function (request, response){
@@ -68,6 +75,7 @@ app.get("/login", function (request, response) {
     // Give a simple login form
     if (typeof request.session.last_login != 'undefined'){
         login_time = "last login was" + request.session.last_login;
+        request.session.shopping_cart;
     } else {
         login_time = "first login";
     }
@@ -79,30 +87,61 @@ app.get("/login", function (request, response) {
     
 
     str = `
-<body>
-<form action="" method="POST">
-login info: ${login_time} by ${my_cookie_name}<br>
-<input type="text" name="username" size="40" placeholder="enter username" ><br />
-<input type="password" name="password" size="40" placeholder="enter password"><br />
-<input type="submit" value="Submit" id="submit">
-</form>
-</body>
-    `;
+    <!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="homepage.css" rel="stylesheet">
+        <title>Login</title>
+    </head>
+    
+    <body>
+    <ul>
+    <li><a href="./index.html">Home</a></li>
+    <li><a id="login-link" href="/login">Login</a></li>
+    <li><a href="/register">Register</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)" class="dropbtn">Products</a>
+      <div class="dropdown-content">
+        <script>
+        document.write('<a href='./products.html?products_key=keyboards'>Keyboards');
+        document.write('<a href='./products.html?products_key=switches'>Switches');
+        document.write('<a href='./products.html?products_key=keycaps'>Keycaps');
+    </script>
+      </div>
+    </li>
+    <li><p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p></li>
+    <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+    </ul>
+        <form action="/login" method="POST">
+            login info: ${login_time} by ${my_cookie_name}<br>
+            <input type="text" name="email" size="40" placeholder="enter email"><br />
+            <input type="password" name="password" size="40" placeholder="enter password"><br />
+            <input type="submit" value="Submit" id="submit">
+            <button type="button" style="position: absolute;" id="return_shopping"
+                onclick="window.location.href = './products.html?products_key=keyboards'">Return to shopping</button>
+        </form>
+    </body>
+    </html>`;
     response.send(str);
  });
+
 
 app.post("/login", function (request, response) {
     // Process login form POST and redirect to logged in page if ok, back to login page if not
     let POST = request.body;
-    let user_name = POST["username"];
-    let user_pass = POST["password"];
+    user_email = POST["email"];
+    var user_pass = encrypt(request.body.password); // uses my encryption function to encrypt the users entered password
+    loggedIn = false;
 
-
-
-    console.log("User name=" + user_name + " password=" + user_pass);
     
-    if (users[user_name] != undefined) {
-        if (users[user_name].password == user_pass) {
+    console.log("User email=" + user_email + " password=" + user_pass);
+    
+    if (users[user_email] != undefined) {
+        if (users[user_email].password == user_pass) {
             if (typeof request.session.last_login != 'undefined'){
             var msg = `you last logged in: ${request.session.last_login}`;
             var now = new Date();
@@ -111,18 +150,58 @@ app.post("/login", function (request, response) {
             var now = " first visit";
         }
         request.session.last_login = now; // creating a variable in the session, lives in the session
-        response.cookie('username', user_name).send(`${msg} <br> ${user_name} logged in ${now}` );
+        response.cookie("email", user_email);
+        response.cookie('loggedIn', loggedIn)
+        response.cookie('cart', request.session.cart)
+        response.redirect('./cart.html');        
     } else {
         response.send('No such user');
     }
 }
 });
 
+app.get('/logout', (request, response) => {
+  // Destroy the cookie
+  response.clearCookie('your_cookie_name');
+  // Destroy the session
+  request.session.destroy(() => {
+    // Redirect the user to the login page
+    response.redirect('/login');
+  });
+});
+
 app.get("/register", function (request, response) {
     // Give a simple register form
     str = `
+    <!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="homepage.css" rel="stylesheet">
+        <title>Login</title>
+    </head>
 <body>
-<form action="" method="POST">
+<ul>
+<li><a href="./index.html">Home</a></li>
+<li><a id="login-link" href="/login">Login</a></li>
+<li><a href="/register">Register</a></li>
+<li class="dropdown">
+  <a href="javascript:void(0)" class="dropbtn">Products</a>
+  <div class="dropdown-content">
+    <script>
+    document.write('<a href='./products.html?products_key=keyboards'>Keyboards');
+    document.write('<a href='./products.html?products_key=switches'>Switches');
+    document.write('<a href='./products.html?products_key=keycaps'>Keycaps');
+</script>
+  </div>
+</li>
+<li><p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p></li>
+<li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+</ul>
+<form action="/register" method="POST">
 <input type="text" name="username" size="40" placeholder="enter username" ><br />
 <input type="password" name="password" size="40" placeholder="enter password"><br />
 <input type="password" name="repeat_password" size="40" placeholder="enter password again"><br />
@@ -130,41 +209,45 @@ app.get("/register", function (request, response) {
 <input type="submit" value="Submit" id="submit">
 </form>
 </body>
+</html>
     `;
     response.send(str);
  });
 
  app.post("/register", function (request, response) {
 
-    
     // process a simple register form
     let POST = request.body;
     console.log(POST);
-    let user_name = POST["username"];
-    let user_pass = POST["password"];
-    let user_email = POST["email"];
-    let user_pass2 = POST["repeat_password"];
+    let encryptedPass = encrypt(POST["password"]);
+    let reg_error = {};
+     user_name = POST["username"];
+     user_pass = POST["password"];
+     user_email = POST["email"];
+     user_pass2 = POST["repeat_password"];
 
    
-    if (users[user_name] == undefined && user_pass == user_pass2) {
-        users[user_name] = {};
-        users[user_name].name = user_name;
-        users[user_name].password = user_pass;
-        users[user_name].email = user_email; 
-        users[user_name].repeat_password = user_pass2;
-
-        let data = JSON.stringify(users);
-        fs.writeFileSync(fname, data, 'utf-8');
-
-        response.send("Got a registration");
-    } else if (users[user_name] != undefined && user_pass == user_pass2) {
-        response.send("User " + user_name + " already exists!");
-    } else if (users[user_name] == undefined && user_pass != user_pass2) {
-        response.send("Passwords do not match!");
+    // used object.keys for the array to check that errors equal to zero
+    // ref for objectkeys: https://www.w3schools.com/jsref/jsref_object_keys.asp
+    if (Object.keys(reg_error).length == 0) { 
+        var email = POST['email'].toLowerCase();
+        users[email] = {};
+        users[email].name = POST['username'];
+        users[email]["password"] = encryptedPass;
+        users[email]["email"] = POST['email'];
+        users[email].num_loggedIn = 0;
+        users[email].last_login = Date();
+        
+        // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
+        fs.writeFileSync(fname, JSON.stringify(users), "utf-8"); 
+        // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
+        response.redirect('/login?' + order_str + '&' + `username=${user_name}` + '&' + `date=${users[email].last_login}`); 
+    } else {
+        POST['reg_error'] = JSON.stringify(reg_error); // if there are errors we want to create a string 
+        let params = new URLSearchParams(POST);
+        response.redirect('register?' + order_str + params.toString()); // then we will redirect them to the register if they have errors
     }
-
-
- });
+    });
 
 app.get("/get_products_data", function (request, response) {
     response.json(products_data);
@@ -177,48 +260,82 @@ app.get("/add_to_cart", function (request, response) {
     response.redirect('./cart.html');
 });
 
+app.post("/update_cart",function(request, response){
+    if(request.cookies.loggedIn == "true"){
+        updated_qty = request.session.cart
+        response.cookie('cart', updated_qty);
+        response.redirect('./invoice.html')
+    } else {
+        response.redirect("/login")
+    }
+});
+
 // Define the increaseQuantity() function and pass the products_key variable as an argument
-function increaseQuantity(request, products_key, index) {
-    // Use the passed products_key variable inside the function
-    request.session.cart[products_key][index] += 1;
-  }
+function increaseQuantity(request, products_key, productId, product_key, products_data) {
+
+      // Use the passed product_key variable to access the correct array of products in the products_data object
+    var products = products_data[product_key];
+
+    var index = products.findIndex(product => product.id === productId);
+
+    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+    request.session.cart[product_key][index] += 1;
+      }
   
   // Define the app.get() method and pass the products_key variable as an argument
   app.get("/increase_quantity", function(request, response) {
     // Get the index of the item from the request query string
-    var index = request.query.index;
+    var productId = request.query.productId;
+
+    // Get the product_key of the selected product from the request query string
+    var product_key = request.query.product_key;
   
     // Increase the value of the item in the array by 1
-    increaseQuantity(request, products_key, index);
+    increaseQuantity(request, products_key, productId, product_key, products_data);
   
     // Redirect the user back to the shopping cart page
     response.redirect("./cart.html");
   });
 
-  function decreaseQuantity(request, products_key, index) {
-    // Check the value of the item in the array
-    if (request.session.cart[products_key][index] > 0) {
-    // Use the passed products_key variable inside the function
-    request.session.cart[products_key][index] -= 1;
+// Define the increaseQuantity() function and pass the products_key variable as an argument
+function decreaseQuantity(request, products_key, productId, product_key, products_data) {
+
+    // Use the passed product_key variable to access the correct array of products in the products_data object
+  var products = products_data[product_key];
+
+  var index = products.findIndex(product => product.id === productId);
+
+  // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+  request.session.cart[product_key][index] -= 1;
     }
-  }
-  
-  // Define the app.get() method and pass the products_key variable as an argument
-  app.get("/decrease_quantity", function(request, response) {
-    // Get the index of the item from the request query string
-    var index = request.query.index;
-  
-    // Increase the value of the item in the array by 1
-    decreaseQuantity(request, products_key, index);
-  
-    // Redirect the user back to the shopping cart page
-    response.redirect("./cart.html");
-  });
+
+// Define the app.get() method and pass the products_key variable as an argument
+app.get("/decrease_quantity", function(request, response) {
+  // Get the index of the item from the request query string
+  var productId = request.query.productId;
+
+  // Get the product_key of the selected product from the request query string
+  var product_key = request.query.product_key;
+
+  // Increase the value of the item in the array by 1
+  decreaseQuantity(request, products_key, productId, product_key, products_data);
+
+  // Redirect the user back to the shopping cart page
+  response.redirect("./cart.html");
+});
 
 app.get("/get_cart", function (request, response) {
     response.json(request.session.cart);
 });
 
+app.post("/get_to_cart", function (request, response){
+    // Get the input element
+    var quantityBox = document.getElementById("quantity-box");
+    // Get the value from the input element
+    var quantity = quantityBox.value;
+    // Set the value in the session storage
+    sessionStorage.setItem("quantity", quantity);
+});
 
 
 

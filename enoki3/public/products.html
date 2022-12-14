@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="./functions.js"></script>
     <link href="homepage.css" rel="stylesheet">
+    <!-- Include any necessary dependencies (e.g. jQuery) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <title>Justin's Keyboard Store</title>
     <style>
@@ -31,6 +33,7 @@
     </style>
     <script>
         var products_data;
+        total = 0;
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products_data = JSON.parse(response);
@@ -42,6 +45,11 @@
             for (pk in shopping_cart) {
                 total += shopping_cart[pk].reduce((a, b) => a + b);
             }
+        });
+        
+        loadJSON('get_cookies', function(response) {
+         // Parsing JSON string into object
+         cookie = JSON.parse(response);
         });
 
         // get the query string
@@ -62,8 +70,8 @@
 
     <ul>
         <li><a href="./index.html">Home</a></li>
-        <li><a href="login">Login</a></li>
-        <li><a href="register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
         <li class="dropdown">
             <a href="javascript:void(0)" class="dropbtn">Products</a>
             <div class="dropdown-content">
@@ -74,11 +82,24 @@
                 </script>
             </div>
         </li>
+        <li>
+            <p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p>
+        </li>
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
     </ul>
 
     <main>
         <script>
+            var userIsLoggedIn = false;
+            // Check if the user is logged in
+            if (userIsLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                loginLink.innerHTML = 'Logout';
+            }
+            cart_total.innerHTML = total;
             var order_str = '';
 
             order_str += `<h1>Please select what ${this_product_key} you want</h1><br>`;

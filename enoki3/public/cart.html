@@ -5,9 +5,12 @@
     <link href="homepage.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <script src="./functions.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         var products_data;
         var subtotal = 0;
+        total = 0;
+        var cookie;
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products_data = JSON.parse(response);
@@ -15,18 +18,26 @@
         loadJSON('get_cart', function (response) {
             // Parsing JSON string into object
             shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
         });
 
 
     </script>
+
 </head>
 
 <body>
 
     <ul>
         <li><a href="./index.html">Home</a></li>
-        <li><a href="login">Login</a></li>
-        <li><a href="register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
         <li class="dropdown">
             <a href="javascript:void(0)" class="dropbtn">Products</a>
             <div class="dropdown-content">
@@ -37,16 +48,25 @@
         </li>
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
     </ul>
-    <h2>You have in your shopping cart:</h2>
+    <h2 style="text-align:center;">You have <span id="cart_total">0</span> item(s) in your shopping cart:</h2>
     <table border>
-        <th>Quantity</th>
         <th>Item</th>
+        <th>Quantity</th>
         <th>Price</th>
         <th>Extended Price</th>
 
 
         <script>
-
+            ifLoggedIn = cookie.loggedIn;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                loginLink.innerHTML = 'Logout';
+            }
+            cart_total.innerHTML = total;
             for (product_key in products_data) {
                 for (i = 0; i < products_data[product_key].length; i++) {
                     if (typeof shopping_cart[product_key] == 'undefined') continue;
@@ -58,7 +78,7 @@
                         var product = products_data[product_key][i];
                         document.write(`
         <tr>
-          <td>${products_data[product_key][i].brand} <img src="${products_data[product_key][i].image}" style="width: 40px; height: 40px;"></td>
+          <td><img src="${products_data[product_key][i].image}" style="width: 40px; height: 40px;">${products_data[product_key][i].brand}</td>
           <td>
             <center>
                 <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${product_key}'">+</button>
@@ -67,7 +87,7 @@
             </center>
           </td>
           <td>\$${products_data[product_key][i].price.toFixed(2)}</td>
-          <td>\$${extended_price}</td>
+          <td>\$${extended_price.toFixed(2)}</td>
           <tr>
         </form>
       `);
@@ -122,4 +142,9 @@
 
 
     </table>
+    <br>
+    <br>
+    <button type="button" style="position: absolute; right: 50%;" id="continue_shopping"
+        onclick="window.location.href = './products.html?products_key=keyboards'">Continue shopping</button>
+
 </body>
