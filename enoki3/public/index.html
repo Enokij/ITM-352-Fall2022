@@ -64,7 +64,7 @@
 <body>
     <ul>
         <li><a href="./index.html">Home</a></li>
-        <li><a id="login-link" href="/login">Login</a></li>
+        <li><a href="/login">Login</a></li>
         <li><a href="/register">Register</a></li>
         <li class="dropdown">
           <a href="javascript:void(0)" class="dropbtn">Products</a>
@@ -79,6 +79,17 @@
         <li><p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p></li>
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
       </ul>
+      <script>
+                    ifLoggedIn = cookie.loggedIn;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                loginLink.innerHTML = 'Logout';
+            }
+      </script>
     <h1>Justin's Keyboard Store</h1>
     <a href="./products.html?products_key=keyboards">
         <img src="./images/keyboardindex.jpg" height="100%" width="100%">

@@ -52,7 +52,7 @@
          // Parsing JSON string into object
          cookie = JSON.parse(response);
         });
-        
+
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -92,9 +92,9 @@
 
     <main>
         <script>
-            var userIsLoggedIn = false;
+            ifLoggedIn = cookie.loggedIn;
             // Check if the user is logged in
-            if (userIsLoggedIn) {
+            if (ifLoggedIn) {
                 // Select the login link element
                 var loginLink = document.querySelector('a[href="/login"]');
                 // Update the login link element to display the logout link

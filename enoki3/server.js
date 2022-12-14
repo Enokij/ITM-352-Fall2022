@@ -75,7 +75,7 @@ app.get("/login", function (request, response) {
     // Give a simple login form
     if (typeof request.session.last_login != 'undefined'){
         login_time = "last login was" + request.session.last_login;
-        request.session.shopping_cart;
+        request.session.cart;
     } else {
         login_time = "first login";
     }
@@ -173,7 +173,7 @@ app.get('/logout', (request, response) => {
   // Destroy the session
   request.session.destroy(() => {
     // Redirect the user to the login page
-    response.redirect('/login');
+    response.redirect('./index.html');
   });
 });
 
