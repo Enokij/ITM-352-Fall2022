@@ -5,6 +5,7 @@ app.use(cookieParser());
 var session = require('express-session');
 var products_data = require('./products.json');
 var user_data = require("./user_data.json");
+var nodemailer = require("nodemailer");
 
 
 order_str = "";
@@ -70,6 +71,17 @@ app.get("/use_session", function (request, response){
     response.send("welcome, your session ID is: " + request.session.id);
     request.session.destroy();
 });
+
+// referenced from Store1 WOD
+// validates the quantities
+function isNonNegInt(userQtyInput, return_errors = false) {
+    errors = []; //assume there are no errors to start
+    if (userQtyInput == '') q = 0; // this handles the blank inputs as if they are 0
+    if (Number(userQtyInput) != userQtyInput) errors.push('<font color="red"><b>Not a number!</b></font>'); // if the user input is not a number, for example like a letter, push the error and say it is not a number
+    else if(userQtyInput < 0) errors.push('<font color="red"><b>Negative value!</b></font>'); // if the input value is negative, push the error that it is a negative number
+    else if (parseInt(userQtyInput) != userQtyInput) errors.push('<font color="red"><b>Not an integer!</b></font>'); // if the input value is not a valid integer, push the error that it is not an integer
+    return return_errors ? errors : (errors.length == 0);
+};
 
 app.get("/login", function (request, response) {
     // Give a simple login form
@@ -312,10 +324,60 @@ app.get("/get_products_data", function (request, response) {
 });
 
 app.get("/add_to_cart", function (request, response) {
+    let valid = true; // initializes the beginning number ordered to be valid
+    let valid_qty = true; // initializes the beginning number ordered to be valid, same as 'valid' but when false, pushes a different error
+    var errors = {};
+    
+
     products_key = request.query['products_key']; // get the product key sent from the form post
-    quantities = request.query['quantities'].map(Number); // Get quantities from the form post and convert strings from form post to numbers
+    quantities = request.query['quantity'].map(Number); // Get quantities from the form post and convert strings from form post to numbers
     request.session.cart[products_key] = quantities; // store the quantities array in the session cart object with the same products_key. 
-    response.redirect('./cart.html');
+    
+    for (i in products_data[products_key]) { // computes the user input of quantity and changes the number of inventory and products sold
+        if (quantities == "") continue; // if the quantity is 0 for that product, continue to the next product
+        if (isNonNegInt(quantities) && quantities > 0) { //check i quantity
+            products_data[products_key][i].quantity_available -= Number(quantities);
+        } else if (quantities[i] < 0){
+            valid_qty = false; // if the quantity entered is not an integer, like a negative number, doesn't let the user proceed
+        } else if (quantities >= products_data[products_key][i].quantity_available) {
+            valid = false;
+        } if (quantities[i] > 0){
+            var no_qty = true;
+        }
+     }
+
+         // create query string of all the quantities
+   let qty_obj = {"quantity": JSON.stringify(request.body.quantity)};
+
+   if(!valid_qty) {
+    errors['quantity_' + i] = `Please choose a valid quantity`;
+    }
+    if(typeof no_qty == 'undefined') { // if all of the quantities were 0, meaning the user did not input anything, direct back to the products store page and push the error to enter in atleast one product to purchase
+        errors['no_quantities'] = 'Please select a quantity';
+        }
+    //if quantity available is less then the amount of quantity ordered, then redirect to error page
+    if (!valid) {
+        errors['quantity_available' + i] = 'Not enough items in stock';
+    } 
+
+    let params = new URLSearchParams();
+    params.append('products_key', products_key); 
+    if (Object.keys(errors).length > 0) { // check errors
+ 
+       params.append('errors', JSON.stringify(errors));
+       response.redirect('./products.html?' + params.toString());
+       return;
+    }
+    else { // assignment 3 code examples
+       if (typeof request.session.cart[products_key] == 'undefined') { //make array for each product category
+          request.session.cart[products_key] = [];
+       } // assignment 3 code examples 
+        // If no errors are found, then redirect to the login page.
+        //store_data = qty_obj; // saves the data in store and stores it for later use
+
+        response.redirect('./cart.html?' + params.toString());
+    }
+    
 });
 
 app.post("/update_cart",function(request, response){
@@ -393,6 +455,94 @@ app.post("/get_to_cart", function (request, response){
     var quantity = quantityBox.value;
     // Set the value in the session storage
     sessionStorage.setItem("quantity", quantity);
+});
+
+app.get('/checkout', function (request, response){
+
+   
+});
+
+app.post("/complete_purchase", function (request, response){
+       // Generate HTML invoice string
+   subtotal = 0;
+   var invoice_str = `Thank you for your order!
+<table border><th style="width:10%">Item</th>
+<th class="text-right" style="width:15%">Quantity</th>
+<th class="text-right" style="width:15%">Price</th>
+<th class="text-right" style="width:15%">Extended Price</th>`;
+   var shopping_cart = request.session.cart;
+   for (product_key in shopping_cart) {
+      for (i = 0; i < shopping_cart[product_key].length; i++) {
+         if (typeof shopping_cart[product_key] == 'undefined') continue;
+         qty = shopping_cart[product_key][i];
+         let extended_price = qty * products_data[product_key][i].price;
+         subtotal += extended_price;
+         if (qty > 0) {
+            invoice_str += `<tr><td>${products_data[product_key][i].item}</td>
+            <td>${qty}</td>
+            <td>$${products_data[product_key][i].price}</td>
+            <td>$${extended_price}
+            <tr>`;
+         }
+      }
+   }
+   // Compute tax
+   var tax_rate = 0.045;
+   var tax = tax_rate * subtotal;
+
+   // Compute shipping
+   if (subtotal <= 20) {
+      shipping = 5;
+   }
+   else if (subtotal <= 50) {
+      shipping = 8;
+   }
+   else {
+      shipping = 0.1 * subtotal; // 10% of subtotal
+   }
+   // Compute grand total
+   var total = subtotal + tax + shipping;
+
+   invoice_str += `<tr>
+        <tr><td colspan="4" align="right">Subtotal: $${subtotal.toFixed(2)}</td></tr>
+        <tr><td colspan="4" align="right">Shipping: $${shipping.toFixed(2)}</td></tr>
+        <tr><td colspan="4" align="right">Tax: $${tax.toFixed(2)}</td></tr>
+        <tr><td colspan="4" align="right">Grand Total: $${total.toFixed(2)}</td></tr>
+        </table>`;
+
+   // from assignment 3 code examples
+   // Set up mail server. Only will work on UH Network due to security restrictions
+   var transporter = nodemailer.createTransport({
+      host: "mail.hawaii.edu",
+      port: 25,
+      secure: false, // use TLS
+      tls: {
+         // do not fail on invalid certs
+         rejectUnauthorized: false
+      }
+   });
+
+   var user_email = request.session.email;
+   var mailOptions = {
+      from: 'enokij@hawaii.edu',
+      to: user_email,
+      subject: `Your invoice from Justin's Keyboard Store `,
+      html: invoice_str
+   };
+   
+   transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+         invoice_str += `<br>Error: Invoice failed to deliver to ${user_email}`;
+      } else {
+         invoice_str += `<br>Your invoice was emailed to ${user_email}`;
+      }
+      response.clearCookie('email');
+      response.clearCookie('loggedIn');
+      response.clearCookie('cart'); // log out
+      response.send(`<script>alert('Your invoice has been sent!'); location.href="/index.html"</script>`);
+      //response.send(invoice_str);
+      request.session.destroy(); // clear cart
+    });
 });
 
 

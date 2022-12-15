@@ -1,11 +1,25 @@
+
+<script src="/user_data.json" type="json"></script>
+<script src="./functions.js"></script>
+<script>
+    let params = (new URL(document.location)).searchParams; //takes data from query string
+    var quantities = []; 
+        if (params.has('quantity')) {
+        quantities = JSON.parse(params.get(`quantity`)); //parses string into JSON object from quantities
+      }
+      
+</script>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="homepage.css" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="homepage.css" rel="stylesheet">
     <script src="./functions.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Invoice</title>
     <script>
         var products_data;
         var subtotal = 0;
@@ -31,12 +45,8 @@
         loadJSON('get_users', function (response){
             user_data = JSON.parse(response);
         });
-
-
     </script>
-
 </head>
-
 <body>
 
     <ul>
@@ -53,31 +63,33 @@
         </li>
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
     </ul>
-    <h2 style="text-align:center;">You have <span id="cart_total">0</span> item(s) in your shopping cart:</h2>
+
+    <script>
+        user_email = cookie.email;
+        if (user_data[user_email].name != 'undefined') {
+            document.write(`<center><h2>Thank you for your support ` + user_data[user_email].name + `!</h2></center>`);
+        }
+    </script>
     <table border>
         <th>Item</th>
         <th>Quantity</th>
         <th>Price</th>
         <th>Extended Price</th>
-
-
         <script>
-                ifLoggedIn = cookie.loggedIn;
-                user_email = cookie.email;
-                cart_total.innerHTML = total;
-                // Check if the user is logged in
-                if (ifLoggedIn) {
-                    // Select the login link element
-                    var loginLink = document.querySelector('a[href="/login"]');
-                    var profileInfo = document.querySelector('a[href="/register"]');
-                    // Update the login link element to display the logout link
-                    loginLink.setAttribute('href', '/logout');
-                    profileInfo.setAttribute('href', './user_update.html');
-                    loginLink.innerHTML = 'Logout';
-                    profileInfo.innerHTML = user_data[user_email].name;
-                }
-            
-            for (product_key in products_data) {
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
+                loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+            }
+        for (product_key in products_data) {
                 for (i = 0; i < products_data[product_key].length; i++) {
                     if (typeof shopping_cart[product_key] == 'undefined') continue;
                     qty = shopping_cart[product_key][i];
@@ -89,13 +101,7 @@
                         document.write(`
         <tr>
           <td><img src="${products_data[product_key][i].image}" style="width: 40px; height: 40px;">${products_data[product_key][i].brand}</td>
-          <td>
-            <center>
-                <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${product_key}'">+</button>
-              <input type="text" id="textbox" value="${qty}" style="width: 20px">
-              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&product_key=${product_key}'">-</button>
-            </center>
-          </td>
+          <td class="text" style="width: 20px"><center>${qty}</center></td>
           <td>\$${products_data[product_key][i].price.toFixed(2)}</td>
           <td>\$${extended_price.toFixed(2)}</td>
           <tr>
@@ -113,11 +119,6 @@
                 shipping = 35;
             } else {
                 shipping = 0.04 * subtotal; // 4% of subtotal
-            }
-
-            if (subtotal == 0) {
-                alert('Your cart is empty');
-                location.href = "products.html?products_key=keyboards";
             }
 
             // Compute grand total
@@ -157,13 +158,11 @@
 
 
     </table>
-    <br>
-    <br>
-    <button type="button" style="position: absolute; right: 50%;" id="continue_shopping"
-        onclick="window.location.href = './products.html?products_key=keyboards'">Continue shopping</button>
-    <form action="/checkout" method="GET">
-        <input type="button" style="position: absolute; right: 40%;" value="Checkout" name="checkout"
-              onclick="location.href='./invoice.html';">
-    </form>
 
+    <form action="/complete_purchase" method=POST>
+        <br>
+        <center><input type=submit class="button" value="Send Invoice to my Email"></center>
+      </form>
+    </script>
 </body>
+</html>

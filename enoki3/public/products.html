@@ -48,19 +48,19 @@
                 total += shopping_cart[pk].reduce((a, b) => a + b);
             }
         });
-        
-        loadJSON('get_cookies', function(response) {
-         // Parsing JSON string into object
-         cookie = JSON.parse(response);
+
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
         });
 
-        loadJSON('get_users', function (response){
+        loadJSON('get_users', function (response) {
             user_data = JSON.parse(response);
         });
 
 
         // get the query string
-        let params = (new URL(document.location)).searchParams;
+        var params = (new URL(document.location)).searchParams;
         if (params.has('products_key')) {
             var this_product_key = params.get('products_key');
         } else {
@@ -68,13 +68,52 @@
             document.stop;
         }
 
+        // taken from Lab 13, credit to Port/Kazman
+        // Shows user if they are inputting an invalid integer or not, dynamically
+        function checkQuantityTextbox(theTextbox) {
+            errs = isNonNegInt(theTextbox.value, true); // validates if there is an error using the isNonNegInt function above
+            if (errs.length == 0) errs = ['You want:']; // if there are no errors, display you want:
+            if (theTextbox.value.trim() == '') errs = ['Quantity']; // if there is an error, replace the label 'quantity' with the error message
+            document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", "); // prints out the error message
+        }
+
+        console.log("Params=" + params); 
+            if (params.has("error")) {
+                let error_msg = params.get("error");
+                alert(error_msg);
+            }
+
+            // check to see that the form is submitted with valid quantities, then redirect to the invoice
+            if (params.has('quantity')) {
+                has_errors = false; // assume the quantities are valid from the start
+                total_qty = 0; //if the number increases, that means the user selected an item
+                for (i = 0; i < products.length; i++) {
+                    if (params.has(`quantity${i}`)) {
+                        a_qty = params.get(`quantity${i}`);
+                        product_form[`quantity${i}`].value = a_qty; // make textboxes sticky 
+                        total_qty += a_qty;
+                        if (!isNonNegInt(a_qty)) {
+                            has_errors = true; // invalid quantity
+                            checkQuantityTextbox(product_form[`quantity${i}`]); // this will show where the error is
+                        }
+                    }
+                }
+                // if the user-inputted data is invalid, such as negative, alert user saying to enter valid quantities only
+                if (has_errors) {
+                    alert("Please enter only valid quantities!");
+                } else if (total_qty == 0) { // no quantity entered, alert user to select a quantity
+                    alert("Please select some quantities!");
+                }
+
+            }
+        
+
     </script>
 </head>
 
-<form name="product_form" action="/process_form" method="POST"></form>
+
 
 <body>
-
     <ul>
         <li><a href="./index.html">Home</a></li>
         <li><a href="/login">Login</a></li>
@@ -97,19 +136,19 @@
 
     <main>
         <script>
-                ifLoggedIn = cookie.loggedIn;
-                user_email = cookie.email;
-                // Check if the user is logged in
-                if (ifLoggedIn) {
-                    // Select the login link element
-                    var loginLink = document.querySelector('a[href="/login"]');
-                    var profileInfo = document.querySelector('a[href="/register"]');
-                    // Update the login link element to display the logout link
-                    loginLink.setAttribute('href', '/logout');
-                    profileInfo.setAttribute('href', './user_update.html');
-                    loginLink.innerHTML = 'Logout';
-                    profileInfo.innerHTML = user_data[user_email].name;
-                }
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
+                loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+            }
             cart_total.innerHTML = total;
             var order_str = '';
 
@@ -118,7 +157,7 @@
             order_str += `<FORM action="/add_to_cart" method="GET">
                 <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}">`;
             products = products_data[this_product_key];
-            for (i = 0; i < products.length; i++) {
+            for (i = 0; i < products_data[this_product_key].length; i++) {
                 order_str +=
                     `<TR>
         <TD><img src="${products[i]['image']}"></TD>
@@ -127,8 +166,12 @@
         <br>
         <TD>$${products[i]['price'].toFixed(2)}</TD>
         <br>
+        <TD>Available: ${products[i]['quantity_available']}</TD>
+        <br>
+        <TD><p id="quantity[${i}]_label">Quantity:</p></TD>
+        
         <TD>
-        <INPUT TYPE="TEXT"  name="quantities[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0"></TD><br><br></TR>`;
+        <INPUT TYPE="TEXT"  id="quantity[${i}]" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0"></TD><br><br></TR>`;
             }
             order_str += `</TABLE><br>
     <INPUT TYPE="SUBMIT"  name="Submit" value="Add to cart">
@@ -137,6 +180,6 @@
         </script>
     </main>
 </body>
-</form>
+
 
 </html>
