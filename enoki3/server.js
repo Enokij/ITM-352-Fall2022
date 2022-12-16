@@ -224,7 +224,22 @@ app.get("/register", function (request, response) {
         <link href="homepage.css" rel="stylesheet">
         <title>Login</title>
     </head>
-<body>
+<body onload='errorMessage()'>
+<script>
+var params = (new URL(document.location)).searchParams;
+function errorMessage() {
+    if (params.has('registerError')) {
+        var errors = JSON.parse(params.get('registerError'));
+        for (i = 0; i < register.elements.length; i++) {
+            register[i].value = params.get(register[i].name);
+            if (typeof errors[register[i].name] != 'undefined') {
+              document.getElementById(register[i].name + '_error').innerHTML = errors[register[i].name];
+            }
+          }
+          alert('Please fix errors on form.');
+      }
+    }
+</script>
 <ul>
 <li><a href="./index.html">Home</a></li>
 <li><a id="login-link" href="/login">Login</a></li>
@@ -241,13 +256,27 @@ app.get("/register", function (request, response) {
 </li>
 <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
 </ul>
-<form action="/register" method="POST">
+<form action="/register" method="POST" name="register">
 <h1>Create your account here!</h1>
-<input type="text" id="name" name="name" size="40" placeholder="enter username" ><br />
-<input type="password" id="password" name="password" size="40" placeholder="enter password"><br />
-<input type="password" id="repeat_password" name="repeat_password" size="40" placeholder="enter password again"><br />
-<input type="email" id="email" name="email" size="40" placeholder="enter email"><br />
-<input type="submit" value="Submit" id="submit">
+
+<label for="name"><b>Username</b></label>
+<div id='name_error' style='color: red;'></div>
+<input type="text" id="name" name="name" size="40" placeholder="enter username" ><br>
+
+<label for="password"><b>Password</b></label>
+<div id='password_error' style='color: red;'></div>
+<input type="password" id="password" name="password" size="40" placeholder="enter password"><br>
+
+<label for="repeatPassword"><b>Repeat Password</b></label>
+<div id='repeatPassword_error' style='color: red;'></div>
+<input type="password" id="repeatPassword" name="repeatPassword" size="40" placeholder="enter password again"><br>
+
+<label for="email"><b>Email</b></label>
+<div id='email_error' style='color: red;'></div>
+<input type="email" id="email" name="email" size="40" placeholder="enter email"><br>
+
+
+<button type="submit" value="Submit" id="submit">Register</button>
 </form>
 </body>
 </html>
@@ -308,8 +337,8 @@ app.get("/register", function (request, response) {
         registerError['password'] = 'Password can not be longer than 16 characters.'; // validates that the password isn't longer than 16 letters
     }
     
-    if (request.body.password != request.body.repeat_password) {
-        registerError['repeat_password'] = 'Passwords do not match.'; // makes sure the password and repeated password match
+    if (request.body.password != request.body.repeatPassword) {
+        registerError['repeatPassword'] = 'Passwords do not match.'; // makes sure the password and repeated password match
     }
 
    
