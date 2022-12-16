@@ -68,45 +68,6 @@
             document.stop;
         }
 
-        // taken from Lab 13, credit to Port/Kazman
-        // Shows user if they are inputting an invalid integer or not, dynamically
-        function checkQuantityTextbox(theTextbox) {
-            errs = isNonNegInt(theTextbox.value, true); // validates if there is an error using the isNonNegInt function above
-            if (errs.length == 0) errs = ['You want:']; // if there are no errors, display you want:
-            if (theTextbox.value.trim() == '') errs = ['Quantity']; // if there is an error, replace the label 'quantity' with the error message
-            document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", "); // prints out the error message
-        }
-
-        console.log("Params=" + params); 
-            if (params.has("error")) {
-                let error_msg = params.get("error");
-                alert(error_msg);
-            }
-
-            // check to see that the form is submitted with valid quantities, then redirect to the invoice
-            if (params.has('quantity')) {
-                has_errors = false; // assume the quantities are valid from the start
-                total_qty = 0; //if the number increases, that means the user selected an item
-                for (i = 0; i < products.length; i++) {
-                    if (params.has(`quantity${i}`)) {
-                        a_qty = params.get(`quantity${i}`);
-                        product_form[`quantity${i}`].value = a_qty; // make textboxes sticky 
-                        total_qty += a_qty;
-                        if (!isNonNegInt(a_qty)) {
-                            has_errors = true; // invalid quantity
-                            checkQuantityTextbox(product_form[`quantity${i}`]); // this will show where the error is
-                        }
-                    }
-                }
-                // if the user-inputted data is invalid, such as negative, alert user saying to enter valid quantities only
-                if (has_errors) {
-                    alert("Please enter only valid quantities!");
-                } else if (total_qty == 0) { // no quantity entered, alert user to select a quantity
-                    alert("Please select some quantities!");
-                }
-
-            }
-        
 
     </script>
 </head>
@@ -136,6 +97,36 @@
 
     <main>
         <script>
+
+            function quantityValidation(quantityString, returnErrors = false) {
+                errors = []; // assume no errors at first
+                if (Number(quantityString) != quantityString) {
+                    errors.push('Not a number!'); // Check if string is a number value
+                } else if (Number(quantityString) < 0) {
+                    errors.push('Negative value!'); // Check if it is non-negative
+                } else if (quantityString == '') {
+                    quantityString = 0;
+                } else if (parseInt(quantityString) != quantityString) {
+                    errors.push('Not an integer!'); // Check that it is an integer
+                } else {
+                    errors.push('<h7>You want:</h7>')
+                }
+                if (returnErrors) {
+                    return errors;
+                } else if (errors.length == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+    //Taken from Lab13 order_page.new.html      
+    function checkQuantityTextbox(theTextbox) {
+        //checks the textbox for errors and sets true outputs to variable errs. 
+        errs = quantityValidation(theTextbox.value, true);
+        //if errors are found, then will write the errors in the quantity_message textbox
+        document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
+
+    }
             ifLoggedIn = cookie.loggedIn;
             user_email = cookie.email;
             // Check if the user is logged in
@@ -168,13 +159,13 @@
         <br>
         <TD>Available: ${products[i]['quantity_available']}</TD>
         <br>
-        <TD><p id="quantity[${i}]_label">Quantity:</p></TD>
+        <TD><p class="error_msg" id="quantity[${i}]_message">Quantity:</p></TD>
         
         <TD>
-        <INPUT TYPE="TEXT"  id="quantity[${i}]" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0"></TD><br><br></TR>`;
+        <INPUT TYPE="TEXT"  id="quantity[${i}]" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0" onkeyup="checkQuantityTextbox(this)"></TD><br><br></TR>`;
             }
             order_str += `</TABLE><br>
-    <INPUT TYPE="SUBMIT"  name="Submit" value="Add to cart">
+    <INPUT TYPE="SUBMIT" id="the_submit" name="Submit" value="Add to cart">
     </FORM>`;
             document.write(order_str);
         </script>

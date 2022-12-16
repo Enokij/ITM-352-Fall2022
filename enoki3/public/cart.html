@@ -28,7 +28,7 @@
             cookie = JSON.parse(response);
         });
 
-        loadJSON('get_users', function (response){
+        loadJSON('get_users', function (response) {
             user_data = JSON.parse(response);
         });
 
@@ -62,21 +62,21 @@
 
 
         <script>
-                ifLoggedIn = cookie.loggedIn;
-                user_email = cookie.email;
-                cart_total.innerHTML = total;
-                // Check if the user is logged in
-                if (ifLoggedIn) {
-                    // Select the login link element
-                    var loginLink = document.querySelector('a[href="/login"]');
-                    var profileInfo = document.querySelector('a[href="/register"]');
-                    // Update the login link element to display the logout link
-                    loginLink.setAttribute('href', '/logout');
-                    profileInfo.setAttribute('href', './user_update.html');
-                    loginLink.innerHTML = 'Logout';
-                    profileInfo.innerHTML = user_data[user_email].name;
-                }
-            
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
+            cart_total.innerHTML = total;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
+                loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+            }
+
             for (product_key in products_data) {
                 for (i = 0; i < products_data[product_key].length; i++) {
                     if (typeof shopping_cart[product_key] == 'undefined') continue;
@@ -88,15 +88,15 @@
                         var product = products_data[product_key][i];
                         document.write(`
         <tr>
-          <td><img src="${products_data[product_key][i].image}" style="width: 40px; height: 40px;">${products_data[product_key][i].brand}</td>
+          <td><img src="${product.image}" style="width: 40px; height: 40px;">${products_data[product_key][i].brand}</td>
           <td>
             <center>
                 <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${product_key}'">+</button>
-              <input type="text" id="textbox" value="${qty}" style="width: 20px">
+              <input type="text" id="textbox" min="0" max="${product.quantity_available}" value="${qty}" style="width: 20px">
               <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&product_key=${product_key}'">-</button>
             </center>
           </td>
-          <td>\$${products_data[product_key][i].price.toFixed(2)}</td>
+          <td>\$${product.price.toFixed(2)}</td>
           <td>\$${extended_price.toFixed(2)}</td>
           <tr>
         </form>
@@ -104,6 +104,7 @@
                     }
                 }
             }
+
 
             var tax_rate = 0.0575;
             var tax = tax_rate * subtotal;
@@ -115,10 +116,6 @@
                 shipping = 0.04 * subtotal; // 4% of subtotal
             }
 
-            if (subtotal == 0) {
-                alert('Your cart is empty');
-                location.href = "products.html?products_key=keyboards";
-            }
 
             // Compute grand total
             var total = subtotal + tax + shipping;
@@ -161,9 +158,9 @@
     <br>
     <button type="button" style="position: absolute; right: 50%;" id="continue_shopping"
         onclick="window.location.href = './products.html?products_key=keyboards'">Continue shopping</button>
-    <form action="/checkout" method="GET">
-        <input type="button" style="position: absolute; right: 40%;" value="Checkout" name="checkout"
-              onclick="location.href='./invoice.html';">
+    <form action="checkout" method="GET">
+        <input type="submit" style="position: absolute; right: 40%;" value="Checkout" name="checkout"
+            onclick="location.href='./invoice.html';">
     </form>
 
 </body>
