@@ -13,7 +13,7 @@ order_str = "";
 
 app.use(session(
     {secret: "MySecretKey", 
-    resave: false, 
+    resave: true, 
     saveUninitialized: true,
     cookie: {
         maxAge: 50000,
@@ -23,8 +23,6 @@ app.use(session(
     }
 }));
 
-var fs = require('fs');
-var fname = "user_data.json"
 
 const crypto = require('crypto'); // used to encrypt password, taken from my assignment2
 const algorithm = 'aes-256-cbc'; // defines the encryption algorithm
@@ -66,6 +64,9 @@ app.use(express.static(__dirname + '/public'));
 
 // gives the server access to the request packet
 app.use(express.urlencoded({ extended: true }));
+
+var fs = require('fs');
+var fname = "user_data.json";
 
 if (fs.existsSync(fname)) {
     var data = fs.readFileSync(fname, 'utf-8');
@@ -113,8 +114,8 @@ app.get("/login", function (request, response) {
     } else {
         login_time = "first login";
     }
-    if (typeof request.cookies.username != 'undefined') {
-        my_cookie_name = request.cookies["username"]; // "grabbing" the cookie to be used
+    if (typeof request.cookies.email != 'undefined') {
+        my_cookie_name = request.cookies["name"]; // "grabbing" the cookie to be used
     } else {
         my_cookie_name = "No user";
     }
@@ -360,8 +361,7 @@ function errorMessage() {
         response.cookie('loggedIn', loggedIn, {maxAge: 50000});
         response.cookie('cart', request.session.cart, {maxAge: 50000});
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
-        response.send(`You have successfully been registered!<br><button type="button" style="position: absolute; right: 50%;" id="continue_shopping"
-        onclick="window.location.href = 'index.html'">Start shopping</button>`); 
+        response.redirect('./index.html') 
     } else {
         request.body['registerError'] = JSON.stringify(registerError); // if there are errors we want to create a string 
         let params = new URLSearchParams(request.body);

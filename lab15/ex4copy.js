@@ -1,4 +1,4 @@
-var express = require('express');
+const express = require('express');
 var app = express();
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -9,6 +9,9 @@ app.use(session(
     resave: true, 
     saveUninitialized: true}));
 
+
+    // routes all other GET requests to files in the public folder
+app.use(express.static(__dirname + '/public'));
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,23 +25,6 @@ if (fs.existsSync(fname)) {
 } else {
     console.log("Sorry file " + fname + " does not exist.");
 }
-
-app.get("/set_cookie", function (request, response){
-    let my_name = "Justin Enoki";
-    response.cookie("My name", my_name, {maxAge: 50000}).send("Cookie sent");
-    // sends the cookie and sets the session
-});
-
-app.get("/use_cookie", function (request, response){
-    let my_cookie = request.cookies["my name"];
-    response.send("welcome to the use cookie page " + my_cookie);
-    // uses the session, but when the cookie times out, the my name variable will be undefined
-});
-
-app.get("/use_session", function (request, response){
-    response.send("welcome, your session ID is: " + request.session.id);
-    request.session.destroy();
-});
 
 app.get("/login", function (request, response) {
     // Give a simple login form
@@ -87,7 +73,8 @@ app.post("/login", function (request, response) {
             var now = " first visit";
         }
         request.session.last_login = now; // creating a variable in the session, lives in the session
-        response.cookie('username', user_name).send(`${msg} <br> ${user_name} logged in ${now}` );
+        response.cookie('username', user_name);
+        response.redirect(`/homepage.html?message=${now}`)
     } else {
         response.send('No such user');
     }
