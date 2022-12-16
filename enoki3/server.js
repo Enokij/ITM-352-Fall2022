@@ -65,6 +65,9 @@ app.use(express.static(__dirname + '/public'));
 // gives the server access to the request packet
 app.use(express.urlencoded({ extended: true }));
 
+for (let key in products_data) {
+    products_data[key].forEach((prod) => {prod.total_sold = 0});
+}
 var fs = require('fs');
 var fname = "user_data.json";
 
@@ -95,16 +98,6 @@ app.get("/use_session", function (request, response){
     request.session.destroy();
 });
 
-// referenced from Store1 WOD
-// validates the quantities
-function isNonNegInt(userQtyInput, return_errors = false) {
-    errors = []; //assume there are no errors to start
-    if (userQtyInput == '') userQtyInput = 0; // this handles the blank inputs as if they are 0
-    if (Number(userQtyInput) != userQtyInput) errors.push('<font color="red"><b>Not a number!</b></font>'); // if the user input is not a number, for example like a letter, push the error and say it is not a number
-    if(userQtyInput < 0) errors.push('<font color="red"><b>Negative value!</b></font>'); // if the input value is negative, push the error that it is a negative number
-    if (parseInt(userQtyInput) != userQtyInput) errors.push('<font color="red"><b>Not an integer!</b></font>'); // if the input value is not a valid integer, push the error that it is not an integer
-    return return_errors ? errors : (errors.length == 0);
-};
 
 app.get("/login", function (request, response) {
     // Give a simple login form
@@ -456,7 +449,7 @@ function increaseQuantity(request, productId, product_key, products_data) {
   });
 
 // Define the increaseQuantity() function and pass the products_key variable as an argument
-function decreaseQuantity(request, productId, product_key, products_data) {
+function decreaseQuantity(request, response, productId, product_key, products_data) {
 
     // Use the passed product_key variable to access the correct array of products in the products_data object
   var products = products_data[product_key];
@@ -465,7 +458,11 @@ function decreaseQuantity(request, productId, product_key, products_data) {
 
   // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
   request.session.cart[product_key][index] -= 1;
-    }
+  if (request.session.cart[product_key][index] == 0) {
+    response.redirect("./products.html?products_key=keyboards");
+  }
+}
+
 
 // Define the app.get() method and pass the products_key variable as an argument
 app.get("/decrease_quantity", function(request, response) {
@@ -476,10 +473,11 @@ app.get("/decrease_quantity", function(request, response) {
   var product_key = request.query.product_key;
 
   // Increase the value of the item in the array by 1
-  decreaseQuantity(request, productId, product_key, products_data);
+  decreaseQuantity(request, response,  productId, product_key, products_data);
 
   // Redirect the user back to the shopping cart page
   response.redirect("./cart.html");
+    
 });
 
 app.get("/get_cart", function (request, response) {
@@ -537,6 +535,8 @@ app.post("/complete_purchase", function (request, response){
             <td>$${products_data[product_key][i].price}</td>
             <td>$${extended_price}
             <tr>`;
+            products_data[product_key][i].quantity_available -= Number(qty);
+            products_data[product_key][i].total_sold += Number(qty);
          }
       }
    }

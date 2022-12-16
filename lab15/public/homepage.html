@@ -7,8 +7,15 @@
     <title>Document</title>
 </head>
 <body>
+    
     <script>
-        document.write('hello');
+    <span id="error_message"></span>
+    document.write('hello');
+        var params = (new URL(document.location)).searchParams;
+        if (params.has('message')) {
+            document.getElementById('error_message').innerHTML = params.get('message');
+
+        }
     </script>
 </body>
 </html>

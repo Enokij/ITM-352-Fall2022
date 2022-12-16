@@ -157,10 +157,12 @@
         <br>
         <TD>$${products[i]['price'].toFixed(2)}</TD>
         <br>
+        <TD>Total Sold: ${products[i].total_sold}</TD>
+        <br>
         <TD>Available: ${products[i]['quantity_available']}</TD>
         <br>
         <TD><p class="error_msg" id="quantity[${i}]_message">Quantity:</p></TD>
-        
+        <br>
         <TD>
         <INPUT TYPE="TEXT"  id="quantity[${i}]" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0" onkeyup="checkQuantityTextbox(this)"></TD><br><br></TR>`;
             }
