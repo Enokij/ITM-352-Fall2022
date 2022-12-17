@@ -104,4 +104,13 @@ li.dropdown {
 body {
   background-color:#F2EEE7;
 }
+
+/*Table styling*/
+table {
+  margin:auto;
+}
+
+.highlight {
+  background-color: yellow;
+}
   
