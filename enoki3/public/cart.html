@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <script src="./functions.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script>
         var products_data;
         var subtotal = 0;
@@ -32,8 +33,16 @@
             user_data = JSON.parse(response);
         });
 
-
+        function highlightRow(checkbox) {
+  var row = checkbox.parentNode.parentNode;
+  if (checkbox.checked) {
+    row.style.backgroundColor = "yellow";
+  } else {
+    row.style.backgroundColor = "";
+  }
+}
     </script>
+
 
 </head>
 
@@ -54,7 +63,7 @@
         <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
     </ul>
     <h2 style="text-align:center;">You have <span id="cart_total">0</span> item(s) in your shopping cart:</h2>
-    <table border>
+    <table style="width: 40%" border>
         <th>Favorite</th>
         <th>Item</th>
         <th>Quantity</th>
@@ -89,7 +98,7 @@
                         var product = products_data[product_key][i];
                         document.write(`
         <tr>
-            <td><input type="checkbox" id="favCheck" name="checkbox"></td>  
+            <td><center><input type="checkbox" class="checkbox" id="favCheck" name="checkbox" onclick="highlightRow(this)"></center></td>  
           <td><img src="${product.image}" style="width: 40px; height: 40px;">${products_data[product_key][i].brand}</td>
           <td>
             <center>
@@ -112,21 +121,21 @@
                 location.href = "./products.html?products_key=keyboards";
                 var tax_rate = 0;
                 var shipping = 0;
-            } else{
-            var tax_rate = 0.0575;
-            var tax = tax_rate * subtotal;
-
-            // Compute shipping
-            if (subtotal <= 500) {
-                shipping = 35;
             } else {
-                shipping = 0.04 * subtotal; // 4% of subtotal
+                var tax_rate = 0.0575;
+                var tax = tax_rate * subtotal;
+
+                // Compute shipping
+                if (subtotal <= 500) {
+                    shipping = 35;
+                } else {
+                    shipping = 0.04 * subtotal; // 4% of subtotal
+                }
+
+
+                // Compute grand total
+                var total = subtotal + tax + shipping;
             }
-
-
-            // Compute grand total
-            var total = subtotal + tax + shipping;
-        }
 
         </script>
 

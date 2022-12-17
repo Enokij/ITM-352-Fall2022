@@ -188,7 +188,7 @@ app.post("/login", function (request, response) {
         response.cookie('cart', request.session.cart, {maxAge: 50000});
         response.redirect('./index.html');        
     } else {
-        response.send('No such user');
+        response.redirect('/login');
     }
 }
 });
@@ -381,7 +381,7 @@ app.get("/add_to_cart", function (request, response) {
             //if the qty meets the above criteria, then update the product's qty sold and available with the respective product quantities entered   
             } else if(checkQuantity(qty) != true) { // if quantities is not equal to a valid number than it is false 
                 valid_num = false;
-            } else if(Number(qty) >= products_data[product][i].qty_available) { // If the quantities enter are greater then the qty_available, then valid = false (returns)
+            } else if(Number(qty) > products_data[product][i].quantity_available) { // If the quantities enter are greater then the qty_available, then valid = false (returns)
                 valid = false;
              } if(qty > 0) { //if quantities is greater than 0 than this statement returns true
                 zero_qty = true;
@@ -391,16 +391,16 @@ app.get("/add_to_cart", function (request, response) {
     /*if the number entered is not a valid number as identified through the checkQuantity(qty) or did not meet the other conditions set in the if statement,
     then redirect user back to the products_display page and set the submit_button parameter to the respective error message*/
     if(valid_num == false){ 
-        response.redirect(`products_display.html?products_key=${product}&error=Please Enter Valid Quantity`);
+        response.redirect(`products.html?products_key=${product}&error=Please Enter Valid Quantity`);
     /*if quantity available is less then the amount of quantity ordered, then redirect user back to the products_display page
     and set the submit_button parameter to the respective error message*/
     }else if(zero_qty == false) {
-        response.redirect(`products_display.html?products_key=${product}&error=Need to select quantity to purchase`);
+        response.redirect(`products.html?products_key=${product}&error=Need to select quantity to purchase`);
     }
-    else if (valid == false) {
-        response.redirect(`products_display.html?products_key=${product}&error=Not Enough Left In Stock!`);
+    else if (!valid) {
+        response.redirect(`products.html?products_key=${product}&error=Not Enough Left In Stock!`);
     } else if (typeof qtys == "") {
-        response.redirect(`products_display.html?products_key=${product}&error=Enter Quantity To Continue!`);
+        response.redirect(`products.html?products_key=${product}&error=Enter Quantity To Continue!`);
     } else {
         // If no errors are found, then redirect to the invoice page.
         products_key= request.query['products_key'];
@@ -411,7 +411,7 @@ app.get("/add_to_cart", function (request, response) {
     }
 });
 
-app.post("/update_cart",function(request, response){
+/*app.post("/update_cart",function(request, response){
     if(request.cookies.loggedIn == "true"){
         updated_qty = request.session.cart
         response.cookie('cart', updated_qty);
@@ -419,10 +419,10 @@ app.post("/update_cart",function(request, response){
     } else {
         response.redirect("/login")
     }
-});
+});*/
 
 // Define the increaseQuantity() function and pass the products_key variable as an argument
-function increaseQuantity(request, productId, product_key, products_data) {
+function increaseQuantity(request, response, productId, product_key, products_data) {
 
       // Use the passed product_key variable to access the correct array of products in the products_data object
     var products = products_data[product_key];
@@ -431,6 +431,9 @@ function increaseQuantity(request, productId, product_key, products_data) {
 
     // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
     request.session.cart[product_key][index] += 1;
+    if (request.session.cart[product_key][index] > products[index].quantity_available); {
+        response.redirect("./products.html?products_key=keyboards");
+      }
       }
   
   // Define the app.get() method and pass the products_key variable as an argument
@@ -442,7 +445,7 @@ function increaseQuantity(request, productId, product_key, products_data) {
     var product_key = request.query.product_key;
   
     // Increase the value of the item in the array by 1
-    increaseQuantity(request, productId, product_key, products_data);
+    increaseQuantity(request, response, productId, product_key, products_data);
   
     // Redirect the user back to the shopping cart page
     response.redirect("./cart.html");
@@ -484,14 +487,7 @@ app.get("/get_cart", function (request, response) {
     response.json(request.session.cart);
 });
 
-app.post("/get_to_cart", function (request, response){
-    // Get the input element
-    var quantityBox = document.getElementById("quantity-box");
-    // Get the value from the input element
-    var quantity = quantityBox.value;
-    // Set the value in the session storage
-    sessionStorage.setItem("quantity", quantity);
-});
+
 
 app.get('/checkout', function (request, response){
     var errors = {};
