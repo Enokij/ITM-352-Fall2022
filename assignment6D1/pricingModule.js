@@ -14,15 +14,19 @@ function setPrice(item_id, products, sales_record, discount, dynamic) {
         if (dynamic) {
           if (!Array.isArray(sales_record)) {
             console.error("Error: salesRecord should be an array");
-            return;}
-          const sales = sales_record.filter(
-            (record) =>
-              record.item_id === product.id &&
-              now - new Date(record.date) < 96 * 60 * 60 * 1000
-          );
+            return;
+          }
+          const sales = sales_record.filter((record) => record.item_id === product.id);
+          const recentSale = sales.reduce((recent, record) => {
+            const recordDate = new Date(record.date);
+            return recordDate > recent ? recordDate : recent;
+          }, new Date(0));  // 0 sets the date to the earliest date possible
+          
+          const hoursSinceSale = (now - recentSale) / (60 * 60 * 1000);
           let dynamicDiscount = 0;
+          
           for (let hours in discountRates) {
-            if (sales.every((record) => now - new Date(record.date) >= hours * 60 * 60 * 1000)) {
+            if (hoursSinceSale >= hours) {
               dynamicDiscount = discountRates[hours];
             }
           }

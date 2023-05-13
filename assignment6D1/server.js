@@ -623,7 +623,8 @@ app.get("/admin_page", function (request, response) {
 app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
-    const dynamic = request.body.dynamic === 'true';
+    const dynamic = request.body.dynamic === 'on';
+    console.log('Dynamic:', dynamic);
 
     pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
 
